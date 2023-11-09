@@ -1,11 +1,7 @@
-import torch
-from utils.criterion import DicBceLoss
+from utils import load_config
+from utils.loader import ImageFolder, get_basic_dataset
 
-output = torch.rand(32, 1024, 1024)
-label  = torch.rand(32, 1024, 1024)
+config = load_config()
+data_config = config["data"]
 
-criterion = DicBceLoss()
-
-loss = criterion(output, label)
-
-print(loss)
+basic_train_set, basic_test_set = get_basic_dataset(data_config)
