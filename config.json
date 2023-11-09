@@ -3,6 +3,22 @@
     "model":{
 
     },
+    "data":[
+        {
+            "name":"croproad",
+            "train_root":"data/croproad_dataset/train/",
+            "test_root":"data/croproad_dataset/test/",
+            "image_":"_1.png",
+            "mask_":"_1 (2).png"
+        },
+        {
+            "name":"deepglobal",
+            "train_root":"data/deepglobal/train/",
+            "test_root":"data/deepglobal/test/",
+            "image_":"_sat.jpg",
+            "mask_":"_mask.png"
+        }
+    ],
     "train":{
         "train_batch_size":4,
         "test_batch_size":4,
