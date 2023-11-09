@@ -1,0 +1,24 @@
+{
+    "cuda":true,
+    "model":{
+
+    },
+    "train":{
+        "train_batch_size":4,
+        "test_batch_size":4,
+        "train_epoch":10,
+        "learning_rate":1e-3,
+        "show_info_step":200,
+        "test_info_step":200
+    },
+    "inference":{
+
+    },
+    "log":{
+        "train_log_root":"log/train/",
+        "infer_log_root":"log/infer/"
+    },
+    "webui":{
+
+    }
+}
