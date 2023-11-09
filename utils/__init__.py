@@ -18,4 +18,5 @@ class LogPrinter:
     def log(self, log_content):
         with open(self.log_path, "a+", encoding="utf-8") as log:
             log.write(log_content + "\n")
+        print(log_content)
         return
