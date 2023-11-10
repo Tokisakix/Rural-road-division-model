@@ -1,5 +1,4 @@
-from utils import load_config
-from utils.loader import ImageFolder, get_basic_dataset
+from utils import load_config, get_basic_dataset
 
 config = load_config()
 data_config = config["data"]
