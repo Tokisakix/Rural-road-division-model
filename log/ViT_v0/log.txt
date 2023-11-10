@@ -1,7 +1,44 @@
-2023-11-10 18:30:15.832472 [INFO] Log is root in log/ViT_v0.
-2023-11-10 18:30:15.833476 [INFO] Log is created in log/ViT_v0/log.txt.
-2023-11-10 18:30:17.458623 [INFO] Not pretrained model.
-2023-11-10 18:30:17.462637 [INFO] Model train in CUDA.
-2023-11-10 18:30:18.414673 [INFO] Loaded data loader.
-2023-11-10 18:30:18.910869 [INFO] Use Adam optimizer.
-2023-11-10 18:30:18.915500 [INFO] Use DicBceLoss criterion.
+2023-11-10 20:12:12.684634 [INFO] Log's root is log/ViT_v0.
+2023-11-10 20:12:14.335333 [INFO] Not pretrained model.
+2023-11-10 20:12:14.339312 [INFO] Model train in CUDA.
+2023-11-10 20:12:15.253191 [INFO] Loaded data loader.
+2023-11-10 20:12:15.709698 [INFO] Use Adam optimizer.
+2023-11-10 20:12:15.717650 [INFO] Use DicBceLoss criterion.
+2023-11-10 20:12:15.920848 [INFO] Start training.
+2023-11-10 20:12:15.927503 [INFO] Epoch:0 Step:0 Loss:1.600000 Time:0.20s.
+2023-11-10 20:12:15.932524 [INFO] Step:0 Test loss:1.800000.
+2023-11-10 20:12:15.940509 [INFO] Model save as _0_.pth.
+2023-11-10 20:12:17.012707 [INFO] Epoch:1 Step:8 Loss:1.600000 Time:1.09s.
+2023-11-10 20:12:17.022389 [INFO] Step:8 Test loss:1.800000.
+2023-11-10 20:12:17.027489 [INFO] Model save as _8_.pth.
+2023-11-10 20:12:18.105147 [INFO] Epoch:2 Step:16 Loss:1.600000 Time:1.09s.
+2023-11-10 20:12:18.115674 [INFO] Step:16 Test loss:1.800000.
+2023-11-10 20:12:18.120264 [INFO] Model save as _16_.pth.
+2023-11-10 20:12:19.191080 [INFO] Epoch:3 Step:24 Loss:1.600000 Time:1.09s.
+2023-11-10 20:12:19.194156 [INFO] Step:24 Test loss:1.800000.
+2023-11-10 20:12:19.205858 [INFO] Model save as _24_.pth.
+2023-11-10 20:12:20.272891 [INFO] Epoch:4 Step:32 Loss:1.600000 Time:1.08s.
+2023-11-10 20:12:20.282543 [INFO] Step:32 Test loss:1.800000.
+2023-11-10 20:12:20.289786 [INFO] Remove _0_.pth.
+2023-11-10 20:12:20.298800 [INFO] Model save as _32_.pth.
+2023-11-10 20:12:21.378711 [INFO] Epoch:5 Step:40 Loss:1.600000 Time:1.11s.
+2023-11-10 20:12:21.382791 [INFO] Step:40 Test loss:1.800000.
+2023-11-10 20:12:21.392797 [INFO] Remove _8_.pth.
+2023-11-10 20:12:21.397737 [INFO] Model save as _40_.pth.
+2023-11-10 20:12:22.475477 [INFO] Epoch:6 Step:48 Loss:1.600000 Time:1.10s.
+2023-11-10 20:12:22.480481 [INFO] Step:48 Test loss:1.800000.
+2023-11-10 20:12:22.484750 [INFO] Remove _16_.pth.
+2023-11-10 20:12:22.487817 [INFO] Model save as _48_.pth.
+2023-11-10 20:12:23.568116 [INFO] Epoch:7 Step:56 Loss:1.600000 Time:1.09s.
+2023-11-10 20:12:23.575073 [INFO] Step:56 Test loss:1.800000.
+2023-11-10 20:12:23.583069 [INFO] Remove _24_.pth.
+2023-11-10 20:12:23.591085 [INFO] Model save as _56_.pth.
+2023-11-10 20:12:24.662190 [INFO] Epoch:8 Step:64 Loss:1.600000 Time:1.09s.
+2023-11-10 20:12:24.670739 [INFO] Step:64 Test loss:1.800000.
+2023-11-10 20:12:24.681953 [INFO] Remove _32_.pth.
+2023-11-10 20:12:24.688954 [INFO] Model save as _64_.pth.
+2023-11-10 20:12:25.762855 [INFO] Epoch:9 Step:72 Loss:1.600000 Time:1.10s.
+2023-11-10 20:12:25.772490 [INFO] Step:72 Test loss:1.800000.
+2023-11-10 20:12:25.783874 [INFO] Remove _40_.pth.
+2023-11-10 20:12:25.792956 [INFO] Model save as _72_.pth.
+2023-11-10 20:12:26.736886 [INFO] Finished training.

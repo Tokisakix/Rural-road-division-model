@@ -1,7 +1,7 @@
 import torch.optim as optim
 import os
 
-from utils import load_config
+from utils import load_config, FrameWork
 from utils.loader import get_loader
 from utils.logger import LogPrinter
 from utils.model import Model, load_model, save_model
@@ -14,18 +14,18 @@ TRAIN_CONFIG = CONFIG["train"]
 LOG_CONFIG   = CONFIG["log"]
 PRO_NAME     = TRAIN_CONFIG["name"]
 PRETRAINED   = TRAIN_CONFIG["pretrained"]
-EPOCH        = TRAIN_CONFIG["train_epoch"]
+EPOCHS       = TRAIN_CONFIG["train_epochs"]
 LR           = TRAIN_CONFIG["learning_rate"]
 SHOW_STEP    = TRAIN_CONFIG["show_info_step"]
 TEST_STEP    = TRAIN_CONFIG["test_info_step"]
+SAVE_STEP    = TRAIN_CONFIG["save_model_step"]
+SAVE_NUM     = TRAIN_CONFIG["save_model_num"]
 LOG_ROOT     = LOG_CONFIG["root"] + PRO_NAME
-LOG_PATH     = LOG_ROOT + "/log.txt"
 
 # 初始化日志
 os.mkdir(LOG_ROOT) if not os.path.isdir(LOG_ROOT) else None
-logger = LogPrinter(LOG_PATH)
-logger.log(f"[INFO] Log is root in {LOG_ROOT}.")
-logger.log(f"[INFO] Log is created in {LOG_PATH}.")
+logger = LogPrinter(LOG_ROOT, SAVE_NUM)
+logger.log(f"[INFO] Log's root is {LOG_ROOT}.")
 
 # 获取模型
 model = load_model("pretrained/pretrained.pth") if CUDA else Model()
@@ -45,5 +45,21 @@ logger.log(f"[INFO] Use {optimizer.__class__.__name__} optimizer.")
 criterion = DicBceLoss()
 logger.log(f"[INFO] Use {criterion.__class__.__name__} criterion.")
 
-# save_model(model, "models/model.pth")
-# save_model(model, "pretrained/pretrained.pth")
+# 定义框架
+framework = FrameWork(
+    model = model,
+    logger = logger,
+    train_loader = train_loader,
+    test_loader = test_loader,
+    optimizer = optimizer,
+    criterion = criterion,
+)
+
+# 训练
+framework.train(
+    CUDA = CUDA, 
+    EPOCHS = EPOCHS, 
+    SHOW_STEP = SHOW_STEP, 
+    TEST_STEP = TEST_STEP, 
+    SAVE_STEP = SAVE_STEP,
+)

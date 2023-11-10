@@ -26,10 +26,12 @@
         "pretrained":false,
         "train_batch_size":4,
         "test_batch_size":4,
-        "train_epoch":10,
+        "train_epochs":10,
         "learning_rate":1e-3,
-        "show_info_step":200,
-        "test_info_step":200
+        "show_info_step":8,
+        "test_info_step":8,
+        "save_model_step":8,
+        "save_model_num":4
     },
     "log":{
         "root":"log/"
