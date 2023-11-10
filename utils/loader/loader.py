@@ -126,6 +126,9 @@ def get_basic_dataset(data_config):
     test_set = []
 
     for dataset_info in data_config:
+        use = dataset_info["use"]
+        if not use:
+            continue
         train_root = dataset_info["train_root"]
         test_root = dataset_info["test_root"]
         image_ = dataset_info["image_"]
