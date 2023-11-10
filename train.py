@@ -1,5 +1,6 @@
 import torch.optim as optim
 import os
+import shutil
 
 from utils import load_config, FrameWork
 from utils.loader import get_loader
@@ -23,7 +24,8 @@ SAVE_NUM     = TRAIN_CONFIG["save_model_num"]
 LOG_ROOT     = LOG_CONFIG["root"] + PRO_NAME
 
 # 初始化日志
-os.mkdir(LOG_ROOT) if not os.path.isdir(LOG_ROOT) else None
+shutil.rmtree(LOG_ROOT) if os.path.isdir(LOG_ROOT) else None
+os.mkdir(LOG_ROOT)
 logger = LogPrinter(LOG_ROOT, SAVE_NUM)
 logger.log(f"[INFO] Log's root is {LOG_ROOT}.")
 

@@ -38,11 +38,11 @@ class FrameWork:
 
                 if STEP % TEST_STEP == 0:
                     LOSS = self._test_(CUDA)
-                    self.logger.log(f"[INFO] Step:{STEP} Test loss:{LOSS:.6f}.")
+                    self.logger.log(f"[INFO] Epoch:{EPOCH} Step:{STEP} Test-loss:{LOSS:.6f}.")
 
                 if STEP % SAVE_STEP == 0:
                     self.logger.save(self.model, STEP)
-                    self.logger.log(f"[INFO] Model save as _{STEP}_.pth.")
+                    self.logger.log(f"[INFO] Epoch:{EPOCH} Step:{STEP} Model save as _{STEP}_.pth.")
 
                 STEP = STEP + 1
         
