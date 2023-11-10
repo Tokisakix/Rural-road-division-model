@@ -6,6 +6,7 @@
     "data":[
         {
             "name":"croproad",
+            "use":true,
             "train_root":"data/croproad_dataset/train/",
             "test_root":"data/croproad_dataset/test/",
             "image_":"_1.png",
@@ -13,6 +14,7 @@
         },
         {
             "name":"deepglobal",
+            "use":true,
             "train_root":"data/deepglobal/train/",
             "test_root":"data/deepglobal/test/",
             "image_":"_sat.jpg",
@@ -27,14 +29,12 @@
         "show_info_step":200,
         "test_info_step":200
     },
-    "inference":{
-
-    },
     "log":{
-        "train_log_root":"log/train/",
-        "infer_log_root":"log/infer/"
+        "root":"log/"
     },
     "webui":{
-
+        "share":false,
+        "port":8080,
+        "model_path":"models/model.pth"
     }
 }
