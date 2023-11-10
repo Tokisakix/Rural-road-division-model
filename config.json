@@ -22,6 +22,8 @@
         }
     ],
     "train":{
+        "name":"ViT_v0",
+        "pretrained":false,
         "train_batch_size":4,
         "test_batch_size":4,
         "train_epoch":10,
