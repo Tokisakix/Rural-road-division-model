@@ -1,3 +1,5 @@
+import datetime
+
 class LogPrinter:
     def __init__(self, log_path):
         self.log_path = log_path
@@ -6,6 +8,7 @@ class LogPrinter:
         return
     
     def log(self, log_content):
+        log_content = f"{datetime.datetime.now()} " + log_content
         with open(self.log_path, "a+", encoding="utf-8") as log:
             log.write(log_content + "\n")
         print(log_content)

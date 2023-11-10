@@ -1,0 +1,7 @@
+2023-11-10 18:30:15.832472 [INFO] Log is root in log/ViT_v0.
+2023-11-10 18:30:15.833476 [INFO] Log is created in log/ViT_v0/log.txt.
+2023-11-10 18:30:17.458623 [INFO] Not pretrained model.
+2023-11-10 18:30:17.462637 [INFO] Model train in CUDA.
+2023-11-10 18:30:18.414673 [INFO] Loaded data loader.
+2023-11-10 18:30:18.910869 [INFO] Use Adam optimizer.
+2023-11-10 18:30:18.915500 [INFO] Use DicBceLoss criterion.
