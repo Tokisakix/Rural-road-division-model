@@ -20,8 +20,8 @@ def predict(image):
     out = MODEL(image).detach()
     out = out.cpu().permute(1, 2, 0)
     out = cv.cvtColor(np.uint8(out * 255), cv.COLOR_RGB2BGRA)
-    out[out > 0.5] = 1
-    out[out <= 0.5] = 0
+    # out[out > 0.5] = 1
+    # out[out <= 0.5] = 0
     return out
 
 interface = gr.Interface(fn=predict, inputs="image", outputs="image")
