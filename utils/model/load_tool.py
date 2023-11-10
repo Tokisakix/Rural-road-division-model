@@ -1,6 +1,6 @@
 import torch
 
-from .model import ViT
+from .model import Model
 
 def load_model(path):
     model = torch.load(path)

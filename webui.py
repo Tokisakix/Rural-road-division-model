@@ -16,8 +16,8 @@ MODEL      = load_model(MODEL_PATH)
 
 def predict(image):
     image = cv.cvtColor(image, cv.COLOR_BGR2RGB) / 255
-    image = (torch.tensor(image).cuda() if CUDA else torch.tensor(image)).permute(2, 0, 1)
-    out = torch.rand(1, 1024, 1024).cuda()
+    image = (torch.FloatTensor(image).cuda() if CUDA else torch.FloatTensor(image)).permute(2, 0, 1)
+    out = MODEL(image).detach()
     out = out.cpu().permute(1, 2, 0)
     out = cv.cvtColor(np.uint8(out * 255), cv.COLOR_RGB2BGRA)
     return out
