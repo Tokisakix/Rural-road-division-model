@@ -7,7 +7,7 @@ import os
 # 饱和度变换
 def random_hue_saturation_value(image, hue_shift_limit=(-180, 180), sat_shift_limit=(-255, 255), val_shift_limit=(-255, 255), u=0.5):
     if np.random.random() < u:
-        image = cv.cvtColor(image, cv.COLOR_BGR2HSV)
+        image = cv.cvtColor(image, cv.COLOR_RGB2HSV)
         h, s, v = cv.split(image)
         hue_shift = np.random.randint(hue_shift_limit[0], hue_shift_limit[1] + 1)
         hue_shift = np.uint8(hue_shift)
@@ -17,7 +17,7 @@ def random_hue_saturation_value(image, hue_shift_limit=(-180, 180), sat_shift_li
         val_shift = np.random.uniform(val_shift_limit[0], val_shift_limit[1])
         v = cv.add(v, val_shift)
         image = cv.merge((h, s, v))
-        image = cv.cvtColor(image, cv.COLOR_HSV2BGR)
+        image = cv.cvtColor(image, cv.COLOR_HSV2RGB)
     return image
 
 # 透视变换
@@ -72,13 +72,16 @@ def random_rotate90(image, mask, u=0.5):
 # 读取单张图片
 def default_loader(img_path, mask_path):
     img = cv.imread(img_path)
-    mask = cv.imread(mask_path)
+    img = cv.cvtColor(img, cv.COLOR_BGR2RGB)
+    mask = cv.imread(mask_path, cv.IMREAD_GRAYSCALE)
     img = random_hue_saturation_value(img, hue_shift_limit=(-30, 30), sat_shift_limit=(-5, 5), val_shift_limit=(-15, 15))
     img, mask = random_shift_scale_rotate(img, mask, shift_limit=(-0.1, 0.1), scale_limit=(-0.1, 0.1), aspect_limit=(-0.1, 0.1), rotate_limit=(-0, 0))
 
     img, mask = random_horizontal_flip(img, mask)
     img, mask = random_ver_flip(img, mask)
     img, mask = random_rotate90(img, mask)
+
+    mask = mask.reshape(*mask.shape, -1)
 
     img = np.array(img, np.float32).transpose(2, 0, 1) / 255.0
     mask = np.array(mask, np.float32).transpose(2, 0, 1) / 255.0

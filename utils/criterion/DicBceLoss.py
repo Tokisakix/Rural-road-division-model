@@ -3,8 +3,8 @@ import torch.nn as nn
 
 class DicBceLoss(nn.Module):
     """
-    input: output_img - FloatTensor[batch_size, height, weight]
-           label_img  - FloatTensor[batch_size, height, weight]
+    input: output_img - FloatTensor[batch_size, channel, height, weight]
+           label_img  - FloatTensor[batch_size, channel, height, weight]
     output: DicBceLoss - FloatTensor
     """
     def __init__(self):

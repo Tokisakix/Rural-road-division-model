@@ -1,1 +1,1 @@
-from DicBceLoss import DicBceLoss
+from .DicBceLoss import DicBceLoss

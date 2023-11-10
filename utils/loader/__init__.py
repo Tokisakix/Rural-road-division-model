@@ -1,1 +1,1 @@
-from loader import get_basic_dataset
+from .loader import ImageFolder, get_basic_dataset
