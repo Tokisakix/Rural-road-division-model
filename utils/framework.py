@@ -8,7 +8,7 @@ class FrameWork:
         self.test_loader = test_loader
         self.optimizer = optimizer
         self.criterion = criterion
-        pass
+        return
 
     def _optim_(self, image, pos, neg):
         return 1.6
