@@ -1,3 +1,7 @@
 # Rural-road-division-model
 
-in updating...
+## train
+to train the Rural-road-division-model, you can enter
+```bash
+python train.py
+```
