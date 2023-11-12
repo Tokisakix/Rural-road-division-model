@@ -4,7 +4,7 @@
 you can put your dataset in the path "/data/{your dataset name}/"
 and add the dataset's information in the config.json
 
-```
+```config.json
 {
     "data":[
         {
@@ -28,12 +28,15 @@ and add the dataset's information in the config.json
 ```
 
 ## train
+
 to train the Rural-road-division-model, you can enter
+
 ```bash
 python train.py
 ```
 
 you can set the train config in the config.json
+
 ```config.json
 {
     "train":{
@@ -51,13 +54,28 @@ you can set the train config in the config.json
 }
 ```
 
+## log
+
+you can set the log config in the config.json
+
+```config.json
+{
+    "log":{
+        "root":"log/"
+    }
+}
+```
+
 ## webui
+
 to use the webui, you can enter
+
 ```bash
 python train.py
 ```
 
 you can set the webui config in the config.json
+
 ```config.json
 {
     "webui":{
