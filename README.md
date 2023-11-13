@@ -4,6 +4,13 @@
 you can put your dataset in the path "/data/{your dataset name}/"
 and add the dataset's information in the config.json
 
+- **name**: Dataset's name
+- **use**: Confirm whether to use
+- **train_root**: Train dataset's root
+- **test_root**: Test dataset's root
+- **image_**: Image file suffix
+- **mask_**: Mask file suffix
+
 ```config.json
 {
     "data":[
