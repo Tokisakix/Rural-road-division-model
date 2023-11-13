@@ -1,6 +1,43 @@
 # Rural-road-division-model
 
-## data
+## File architecture
+
+```
+T:.
+├─data
+│  ├─croproad_dataset
+│  │  ├─test
+│  │  └─train
+│  └─deepglobal
+│      ├─test
+│      ├─train
+│      └─valid
+├─flagged
+├─log
+│  ├─ViT_v0
+│  └─ViT_v1
+├─models
+├─pretrained
+└─utils
+    ├─criterion
+    ├─loader
+    ├─logger
+    ├─model
+```
+
+## Requirements
+
+```requirements.txt
+python==3.11.6
+gradio==4.1.2
+gradio_client==0.7.0
+numpy==1.26.1
+opencv-python==4.8.1.78
+torch==2.1.0+cu118
+```
+
+## Data
+
 you can put your dataset in the path "/data/{your dataset name}/"
 and add the dataset's information in the config.json
 
@@ -34,7 +71,7 @@ and add the dataset's information in the config.json
 }
 ```
 
-## train
+## Train
 
 to train the Rural-road-division-model, you can enter
 
@@ -61,7 +98,7 @@ you can set the train config in the config.json
 }
 ```
 
-## log
+## Log
 
 you can set the log config in the config.json
 
@@ -73,7 +110,7 @@ you can set the log config in the config.json
 }
 ```
 
-## webui
+## Webui
 
 to use the webui, you can enter
 
