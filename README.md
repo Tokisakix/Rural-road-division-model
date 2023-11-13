@@ -1,8 +1,8 @@
 # Rural-road-division-model
 
-## File architecture
+**File architecture**
 
-```
+```tree
 T:.
 ├─data
 │  ├─croproad_dataset
@@ -25,7 +25,7 @@ T:.
     ├─model
 ```
 
-## Requirements
+**Requirements**
 
 ```requirements.txt
 python==3.11.6
@@ -36,7 +36,43 @@ opencv-python==4.8.1.78
 torch==2.1.0+cu118
 ```
 
-## Data
+**How to use this framework**
+
+1. The framework automatically writes the interface of the dataloader in advance, you can get the dataloader through the function **get_loader()**, you can set the parameter information of the dataloader and the information of the dataset in **config.json**, the interface information is as follows:
+
+```python
+from utils.loader import get_loader
+
+train_loader, test_loader = get_loader()
+
+# train_loader return three FloatTensor, the original image, the mask and the negative example image
+# - original image           : FloatTensor[batch_size, 3, 1024, 1024]
+# - mask                     : FloatTensor[batch_size, 1, 1024, 1024]
+# - negative example image   : FloatTensor[batch_size, 3, 1024, 1024]
+#
+# test_loader return two FloatTensor, the original image and the mask
+# - original image           : FloatTensor[batch_size, 3, 1024, 1024]
+# - mask                     : FloatTensor[batch_size, 1, 1024, 1024]
+```
+
+2. The framework allows you to design your model freely, make sure that the input and output interfaces of your model are as follows:
+
+```python
+from utils.model import Model
+
+model = Model()
+# model.train() accept three parameters and return the loss value for this training
+# [input]   original image   : FloatTensor[batch_size, 3, 1024, 1024]
+# [input]   positive example : FloatTensor[batch_size, 3, 1024, 1024]
+# [input]   negtive example  : FloatTensor[batch_size, 3, 1024, 1024]
+# [output]  train loss       : float
+#
+# model.infer() accept one parameters and return the predict image
+# [input]   original image   : FloatTensor[batch_size, 3, 1024, 1024]
+# [output]  predict image    : FloatTensor[batch_size, 3, 1024, 1024]
+```
+
+**Data**
 
 you can put your dataset in the path "/data/{your dataset name}/"
 and add the dataset's information in the config.json
@@ -48,7 +84,7 @@ and add the dataset's information in the config.json
 - **image_**: Image file suffix
 - **mask_**: Mask file suffix
 
-```config.json
+```json
 {
     "data":[
         {
@@ -71,7 +107,7 @@ and add the dataset's information in the config.json
 }
 ```
 
-## Train
+**Train**
 
 to train the Rural-road-division-model, you can enter
 
@@ -81,7 +117,7 @@ python train.py
 
 you can set the train config in the config.json
 
-```config.json
+```json
 {
     "train":{
         "name":"ViT_v1",
@@ -98,11 +134,11 @@ you can set the train config in the config.json
 }
 ```
 
-## Log
+**Log**
 
 you can set the log config in the config.json
 
-```config.json
+```json
 {
     "log":{
         "root":"log/"
@@ -110,7 +146,7 @@ you can set the log config in the config.json
 }
 ```
 
-## Webui
+**Webui**
 
 to use the webui, you can enter
 
@@ -120,7 +156,7 @@ python train.py
 
 you can set the webui config in the config.json
 
-```config.json
+```json
 {
     "webui":{
         "share":false,
