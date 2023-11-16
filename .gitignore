@@ -1,0 +1,5 @@
+# ignore the weights
+*.th
+
+#ignore the idea settings
+*.idea

@@ -1,0 +1,38 @@
+[33m729626a[m[33m ([m[1;36mHEAD -> [m[1;32mmain[m[33m)[m update data
+[33mf9d6aeb[m update weights
+[33mc420263[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m add weights
+[33m7e9f420[m networks added
+[33m2ff1eb3[m Update README.md
+[33m56cca2d[m Update file arch and requirements.txt in README.md
+[33mee4acbd[m Update data in README.md
+[33m8dcfaaa[m Update log in README.md
+[33mda37166[m Update data in README.md
+[33m8d989d1[m Update config.json in README.md
+[33mfd0f661[m Update config.json in README.md
+[33m526d531[m Update webui in README.md
+[33me76e981[m Update train in README.md
+[33m39e2b3f[m add requirements.txt
+[33md98db5a[m update config
+[33mb76ae78[m update framework
+[33m7185816[m add framework
+[33m0c264c1[m add logger
+[33mf64842a[m build framework
+[33mbd652c3[m Merge branch 'main' of https://github.com/Tokisakix/--
+[33m2153d05[m delete train.ipynb
+[33m6a01044[m delete train.ipynb
+[33m269abf1[m Merge branch 'main' of https://github.com/Tokisakix/--
+[33m744550c[m update loader
+[33m26ae1ce[m update webui
+[33m02b932d[m update webui
+[33mffb39b1[m update loader
+[33m0907c69[m add webui
+[33m95bf99d[m add model
+[33m7e8722c[m change code architecture
+[33mba1f9a3[m add log
+[33m32153a7[m add train file
+[33m9776b42[m add basic_loader
+[33m1ebd4c9[m add criterion
+[33ma7acdce[m add data
+[33mda15dec[m Create README.md
+[33m969673d[m add file
+[33m11248b1[m add config.json

@@ -5,18 +5,22 @@ import cv2 as cv
 import os
 
 from utils import load_config
-from .transfer import random_hue_saturation_value, random_shift_scale_rotate, random_horizontal_flip, random_ver_flip, random_rotate90
+from .transfer import random_hue_saturation_value, random_shift_scale_rotate, random_horizontal_flip, random_ver_flip, \
+    random_rotate90
 
 CONFIG = load_config()
 DATA_CONFIG = CONFIG["data"]
+
 
 # 读取单张图片
 def basic_loader(img_path, mask_path):
     img = cv.imread(img_path)
     img = cv.cvtColor(img, cv.COLOR_BGR2RGB)
     mask = cv.imread(mask_path, cv.IMREAD_GRAYSCALE)
-    img = random_hue_saturation_value(img, hue_shift_limit=(-30, 30), sat_shift_limit=(-5, 5), val_shift_limit=(-15, 15))
-    img, mask = random_shift_scale_rotate(img, mask, shift_limit=(-0.1, 0.1), scale_limit=(-0.1, 0.1), aspect_limit=(-0.1, 0.1), rotate_limit=(-0, 0))
+    img = random_hue_saturation_value(img, hue_shift_limit=(-30, 30), sat_shift_limit=(-5, 5),
+                                      val_shift_limit=(-15, 15))
+    img, mask = random_shift_scale_rotate(img, mask, shift_limit=(-0.1, 0.1), scale_limit=(-0.1, 0.1),
+                                          aspect_limit=(-0.1, 0.1), rotate_limit=(-0, 0))
 
     img, mask = random_horizontal_flip(img, mask)
     img, mask = random_ver_flip(img, mask)
@@ -30,12 +34,14 @@ def basic_loader(img_path, mask_path):
     mask[mask <= 0.5] = 0
     return img, mask
 
+
 # 获取对应文件夹下的所有图片序号
 def get_folder_img_ids(root, image_, mask_):
     ids = filter(lambda x: x.find(image_) != -1, os.listdir(root))
     ids = map(lambda x: x[:-len(image_)], ids)
     ids = list(ids)
     return ids
+
 
 # 文件夹数据集
 class ImageFolder(Dataset):
@@ -60,6 +66,7 @@ class ImageFolder(Dataset):
     def __len__(self):
         return len(self.ids)
 
+
 # 最终的加载器
 class FinalDataSet(Dataset):
     def __init__(self, basic_set, train):
@@ -70,18 +77,19 @@ class FinalDataSet(Dataset):
         self.pos = torch.rand(32, 1, 1024, 1024)
         self.neg = torch.rand(32, 1, 1024, 1024) if train else None
         return
-    
+
     def __getitem__(self, index):
         image = self.images[index]
-        pos   = self.pos[index]
+        pos = self.pos[index]
         if not self.train:
             return image, pos
-        neg   = self.neg[index]
+        neg = self.neg[index]
         return image, pos, neg
-    
+
     def __len__(self):
         return self.images.shape[0]
-    
+
+
 # 获取初级数据集
 def get_basic_dataset(data_config):
     train_set = []
@@ -108,6 +116,7 @@ def get_basic_dataset(data_config):
         basic_test_set = basic_test_set + test_set[idx]
 
     return basic_train_set, basic_test_set
+
 
 # 获取最终的数据集
 def get_final_set():

@@ -8,6 +8,7 @@ TRAIN_CONFIG = CONFIG["train"]
 TRAIN_BATCH_SIZE = TRAIN_CONFIG["train_batch_size"]
 TEST_BATCH_SIZE = TRAIN_CONFIG["test_batch_size"]
 
+
 # 获取最终加载器
 def get_loader():
     final_train_set, final_test_set = get_final_set()
