@@ -6,53 +6,20 @@ from torchvision import models
 
 nonlinearity = partial(F.relu, inplace=True)
 
-<<<<<<< HEAD
-
-=======
->>>>>>> c42026345924026d87fde1ac863b15283a28593a
 class Dblock(nn.Module):
     def __init__(self, channel):
         super(Dblock, self).__init__()
-        self.dilate1 = nn.Conv2d(channel,
-                                 channel,
-                                 kernel_size=3,
-                                 dilation=1,
-                                 padding=1)
-        self.dilate2 = nn.Conv2d(channel,
-                                 channel,
-                                 kernel_size=3,
-                                 dilation=2,
-                                 padding=2)
-        self.dilate3 = nn.Conv2d(channel,
-                                 channel,
-                                 kernel_size=3,
-                                 dilation=4,
-                                 padding=4)
-        self.dilate4 = nn.Conv2d(channel,
-                                 channel,
-                                 kernel_size=3,
-                                 dilation=8,
-                                 padding=8)
-<<<<<<< HEAD
-        # self.dilate5 = nn.Conv2d(channel, channel, kernel_size=3, dilation=16, padding=16)
-=======
-        #self.dilate5 = nn.Conv2d(channel, channel, kernel_size=3, dilation=16, padding=16)
->>>>>>> c42026345924026d87fde1ac863b15283a28593a
-        for m in self.modules():
-            if isinstance(m, nn.Conv2d) or isinstance(m, nn.ConvTranspose2d):
-                if m.bias is not None:
-                    m.bias.data.zero_()
+        self.dilate1 = nn.Conv2d(channel, channel, kernel_size=3, dilation=1, padding=1)
+        self.dilate2 = nn.Conv2d(channel, channel, kernel_size=3, dilation=2, padding=2)
+        self.dilate3 = nn.Conv2d(channel, channel, kernel_size=3, dilation=4, padding=4)
+        self.dilate4 = nn.Conv2d(channel, channel, kernel_size=3, dilation=8, padding=8)
+        return
 
     def forward(self, x):
         dilate1_out = nonlinearity(self.dilate1(x))
         dilate2_out = nonlinearity(self.dilate2(dilate1_out))
         dilate3_out = nonlinearity(self.dilate3(dilate2_out))
         dilate4_out = nonlinearity(self.dilate4(dilate3_out))
-<<<<<<< HEAD
-        # dilate5_out = nonlinearity(self.dilate5(dilate4_out))
-=======
-        #dilate5_out = nonlinearity(self.dilate5(dilate4_out))
->>>>>>> c42026345924026d87fde1ac863b15283a28593a
         out = x + dilate1_out + dilate2_out + dilate3_out + dilate4_out  # + dilate5_out
         return out
 
@@ -65,12 +32,7 @@ class DecoderBlock(nn.Module):
         self.norm1 = nn.BatchNorm2d(in_channels // 4)
         self.relu1 = nonlinearity
 
-        self.deconv2 = nn.ConvTranspose2d(in_channels // 4,
-                                          in_channels // 4,
-                                          3,
-                                          stride=2,
-                                          padding=1,
-                                          output_padding=1)
+        self.deconv2 = nn.ConvTranspose2d(in_channels // 4, in_channels // 4, 3, stride=2, padding=1, output_padding=1)
         self.norm2 = nn.BatchNorm2d(in_channels // 4)
         self.relu2 = nonlinearity
 
@@ -89,11 +51,7 @@ class DecoderBlock(nn.Module):
         x = self.norm3(x)
         x = self.relu3(x)
         return x
-
-<<<<<<< HEAD
-
-=======
->>>>>>> c42026345924026d87fde1ac863b15283a28593a
+        
 class DinkNet34(nn.Module):
     def __init__(self, num_classes=1, num_channels=3):
         super(DinkNet34, self).__init__()
@@ -141,19 +99,11 @@ class DinkNet34(nn.Module):
         d3 = self.decoder3(d4) + e2
         d2 = self.decoder2(d3) + e1
         d1 = self.decoder1(d2)
-<<<<<<< HEAD
-=======
-        features = d1
->>>>>>> c42026345924026d87fde1ac863b15283a28593a
-
+        
         out = self.finaldeconv1(d1)
         out = self.finalrelu1(out)
         out = self.finalconv2(out)
         out = self.finalrelu2(out)
         out = self.finalconv3(out)
-
-<<<<<<< HEAD
+        
         return F.sigmoid(out)
-=======
-        return F.sigmoid(out), features
->>>>>>> c42026345924026d87fde1ac863b15283a28593a
