@@ -3,7 +3,7 @@
 **File architecture**
 
 ```tree
-T:.
+Rural-road-division-model:.
 ├─data
 │  ├─croproad_dataset
 │  │  ├─test
@@ -17,6 +17,7 @@ T:.
 │  ├─ViT_v0
 │  └─ViT_v1
 ├─models
+├─network
 ├─pretrained
 └─utils
     ├─criterion
