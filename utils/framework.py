@@ -1,5 +1,6 @@
 from time import perf_counter
 
+
 class FrameWork:
     def __init__(self, model, logger, train_loader, test_loader, optimizer, criterion):
         self.model = model
@@ -45,6 +46,6 @@ class FrameWork:
                     self.logger.log(f"[INFO] Epoch:{EPOCH} Step:{STEP} Model save as _{STEP}_.pth.")
 
                 STEP = STEP + 1
-        
+
         self.logger.log(f"[INFO] Finished training.")
         return

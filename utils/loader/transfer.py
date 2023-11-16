@@ -1,8 +1,10 @@
 import numpy as np
 import cv2 as cv
 
+
 # 饱和度变换
-def random_hue_saturation_value(image, hue_shift_limit=(-180, 180), sat_shift_limit=(-255, 255), val_shift_limit=(-255, 255), u=0.5):
+def random_hue_saturation_value(image, hue_shift_limit=(-180, 180), sat_shift_limit=(-255, 255),
+                                val_shift_limit=(-255, 255), u=0.5):
     if np.random.random() < u:
         image = cv.cvtColor(image, cv.COLOR_RGB2HSV)
         h, s, v = cv.split(image)
@@ -17,8 +19,10 @@ def random_hue_saturation_value(image, hue_shift_limit=(-180, 180), sat_shift_li
         image = cv.cvtColor(image, cv.COLOR_HSV2RGB)
     return image
 
+
 # 透视变换
-def random_shift_scale_rotate(image, mask, shift_limit=(-0.0, 0.0), scale_limit=(-0.0, 0.0), rotate_limit=(-0.0, 0.0), aspect_limit=(-0.0, 0.0), border_mode=cv.BORDER_CONSTANT, u=0.5):
+def random_shift_scale_rotate(image, mask, shift_limit=(-0.0, 0.0), scale_limit=(-0.0, 0.0), rotate_limit=(-0.0, 0.0),
+                              aspect_limit=(-0.0, 0.0), border_mode=cv.BORDER_CONSTANT, u=0.5):
     if np.random.random() < u:
         height, width, channel = image.shape
 
@@ -41,9 +45,12 @@ def random_shift_scale_rotate(image, mask, shift_limit=(-0.0, 0.0), scale_limit=
         box0 = box0.astype(np.float32)
         box1 = box1.astype(np.float32)
         mat = cv.getPerspectiveTransform(box0, box1)
-        image = cv.warpPerspective(image, mat, (width, height), flags=cv.INTER_LINEAR, borderMode=border_mode, borderValue=(0, 0, 0,))
-        mask = cv.warpPerspective(mask, mat, (width, height), flags=cv.INTER_LINEAR, borderMode=border_mode, borderValue=(0, 0, 0,))
+        image = cv.warpPerspective(image, mat, (width, height), flags=cv.INTER_LINEAR, borderMode=border_mode,
+                                   borderValue=(0, 0, 0,))
+        mask = cv.warpPerspective(mask, mat, (width, height), flags=cv.INTER_LINEAR, borderMode=border_mode,
+                                  borderValue=(0, 0, 0,))
     return image, mask
+
 
 # 水平翻转
 def random_horizontal_flip(image, mask, u=0.5):
@@ -52,12 +59,14 @@ def random_horizontal_flip(image, mask, u=0.5):
         mask = cv.flip(mask, 1)
     return image, mask
 
+
 # 垂直翻转
 def random_ver_flip(image, mask, u=0.5):
     if np.random.random() < u:
         image = cv.flip(image, 0)
         mask = cv.flip(mask, 0)
     return image, mask
+
 
 # 90°翻转
 def random_rotate90(image, mask, u=0.5):
