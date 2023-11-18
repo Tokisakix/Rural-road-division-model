@@ -4,7 +4,7 @@ import torch.nn.functional as F
 from functools import partial
 from torchvision import models
 
-nonlinearity = partial(F.relu, inplace=True)
+ReLU = partial(F.relu, inplace=True)
 
 class Dblock(nn.Module):
     def __init__(self, channel):
@@ -16,10 +16,10 @@ class Dblock(nn.Module):
         return
 
     def forward(self, x):
-        dilate1_out = nonlinearity(self.dilate1(x))
-        dilate2_out = nonlinearity(self.dilate2(dilate1_out))
-        dilate3_out = nonlinearity(self.dilate3(dilate2_out))
-        dilate4_out = nonlinearity(self.dilate4(dilate3_out))
+        dilate1_out = ReLU(self.dilate1(x))
+        dilate2_out = ReLU(self.dilate2(dilate1_out))
+        dilate3_out = ReLU(self.dilate3(dilate2_out))
+        dilate4_out = ReLU(self.dilate4(dilate3_out))
         out = x + dilate1_out + dilate2_out + dilate3_out + dilate4_out  # + dilate5_out
         return out
 
@@ -30,15 +30,16 @@ class DecoderBlock(nn.Module):
 
         self.conv1 = nn.Conv2d(in_channels, in_channels // 4, 1)
         self.norm1 = nn.BatchNorm2d(in_channels // 4)
-        self.relu1 = nonlinearity
+        self.relu1 = ReLU
 
         self.deconv2 = nn.ConvTranspose2d(in_channels // 4, in_channels // 4, 3, stride=2, padding=1, output_padding=1)
         self.norm2 = nn.BatchNorm2d(in_channels // 4)
-        self.relu2 = nonlinearity
+        self.relu2 = ReLU
 
         self.conv3 = nn.Conv2d(in_channels // 4, n_filters, 1)
         self.norm3 = nn.BatchNorm2d(n_filters)
-        self.relu3 = nonlinearity
+        self.relu3 = ReLU
+        return
 
     def forward(self, x):
         x = self.conv1(x)
@@ -51,13 +52,16 @@ class DecoderBlock(nn.Module):
         x = self.norm3(x)
         x = self.relu3(x)
         return x
-        
+
+"""
+inputs : FloatTensor[batch_size, 3, 1024, 1024]
+outputs: FloatTensor[batch_size, 1, 1024, 1024]
+"""       
 class DinkNet34(nn.Module):
-    def __init__(self, num_classes=1, num_channels=3):
+    def __init__(self, num_classes=1, num_channels=3, filters = [64, 128, 256, 512]):
         super(DinkNet34, self).__init__()
 
-        filters = [64, 128, 256, 512]
-        resnet = models.resnet34(pretrained=True)
+        resnet = models.resnet34(weights="DEFAULT")
         self.firstconv = resnet.conv1
         self.firstbn = resnet.bn1
         self.firstrelu = resnet.relu
@@ -75,10 +79,11 @@ class DinkNet34(nn.Module):
         self.decoder1 = DecoderBlock(filters[0], filters[0])
 
         self.finaldeconv1 = nn.ConvTranspose2d(filters[0], 32, 4, 2, 1)
-        self.finalrelu1 = nonlinearity
+        self.finalrelu1 = ReLU
         self.finalconv2 = nn.Conv2d(32, 32, 3, padding=1)
-        self.finalrelu2 = nonlinearity
+        self.finalrelu2 = ReLU
         self.finalconv3 = nn.Conv2d(32, num_classes, 3, padding=1)
+        return
 
     def forward(self, x):
         # Encoder
@@ -107,3 +112,11 @@ class DinkNet34(nn.Module):
         out = self.finalconv3(out)
         
         return F.sigmoid(out)
+
+if __name__ == "__main__":
+    model   = DinkNet34()
+    inputs  = torch.rand(4, 3, 1024, 1024)
+    outputs = model(inputs)
+    print(model)
+    print("inputs's shape : ", inputs.shape)
+    print("outputs's shape: ", outputs.shape)
