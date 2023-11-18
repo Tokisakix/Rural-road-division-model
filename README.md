@@ -1,6 +1,6 @@
 # Rural-road-division-model
 
-[English](README_en.md) | [中文](README_zh.md)
+[English](README.md) | [中文](README_zh.md)
 
 **File architecture**
 

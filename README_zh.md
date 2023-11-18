@@ -1,5 +1,7 @@
 # Rural-road-division-model
 
+[English](README.md) | [中文](README_zh.md)
+
 **文件架构**
 
 ```tree
