@@ -1,6 +1,6 @@
 # Rural-road-division-model
 
-**File architecture**
+**文件架构**
 
 ```tree
 Rural-road-division-model:.
@@ -26,7 +26,7 @@ Rural-road-division-model:.
     ├─model
 ```
 
-**Requirements**
+**环境需求**
 
 ```requirements.txt
 python==3.11.6
@@ -37,53 +37,53 @@ opencv-python==4.8.1.78
 torch==2.1.0+cu118
 ```
 
-**How to use this framework**
+**如何使用该框架**
 
-1. The framework automatically writes the interface of the dataloader in advance, you can get the dataloader through the function **get_loader()**, you can set the parameter information of the dataloader and the information of the dataset in **config.json**, the interface information is as follows:
+1. 此框架已经提前写好数据集加载程序, 你可以通过 **get_loader()** 函数来获取数据加载器, 你可以在 **config.json** 中填写你需要数据集的信息, 数据加载器的使用案例和接口如下:
 
 ```python
 from utils.loader import get_loader
 
 train_loader, test_loader = get_loader()
 
-# train_loader return three FloatTensor, the original image, the mask and the negative example image
+# train_loader 有三个返回值，类型均为 FloatTensor, 分别代表原始图片，原始图片的标注，负例图片
 # - original image           : FloatTensor[batch_size, 3, 1024, 1024]
 # - mask                     : FloatTensor[batch_size, 1, 1024, 1024]
 # - negative example image   : FloatTensor[batch_size, 3, 1024, 1024]
 #
-# test_loader return two FloatTensor, the original image and the mask
+# test_loader 有两个返回值，类型均为 FloatTensor, 分别代表原始图片，原始图片的标注
 # - original image           : FloatTensor[batch_size, 3, 1024, 1024]
 # - mask                     : FloatTensor[batch_size, 1, 1024, 1024]
 ```
 
-2. The framework allows you to design your model freely, make sure that the input and output interfaces of your model are as follows:
+2. 这个框架允许你自定义你的模型，只要保证你的模型数据接口与下列一致
 
 ```python
 from utils.model import Model
 
 model = Model()
-# model.train() accept three parameters and return the loss value for this training
+# model.train() 接受三个参数，并返回本次训练的损失值
 # [input]   original image   : FloatTensor[batch_size, 3, 1024, 1024]
 # [input]   positive example : FloatTensor[batch_size, 3, 1024, 1024]
 # [input]   negtive example  : FloatTensor[batch_size, 3, 1024, 1024]
 # [output]  train loss       : float
 #
-# model.infer() accept one parameters and return the predict image
+# model.infer() 接受一个参数并返回模型的预测结果
 # [input]   original image   : FloatTensor[batch_size, 3, 1024, 1024]
 # [output]  predict image    : FloatTensor[batch_size, 3, 1024, 1024]
 ```
 
-**Data**
+**数据集**
 
-you can put your dataset in the path "/data/{your dataset name}/"
-and add the dataset's information in the config.json
+你可以将你的数据集放在路径 "/data/{your dataset name}/" 中
+并在 config.json 中添加下列属性
 
-- **name**: Dataset's name
-- **use**: Confirm whether to use
-- **train_root**: Train dataset's root
-- **test_root**: Test dataset's root
-- **image_**: Image file suffix
-- **mask_**: Mask file suffix
+- **name**: 数据集的名称
+- **use**: 确认是否使用
+- **train_root**: 训练集的路径
+- **test_root**: 测试集的路径
+- **image_**: 原始图片的后缀
+- **mask_**: 标注图片的后缀
 
 ```json
 {
@@ -108,15 +108,15 @@ and add the dataset's information in the config.json
 }
 ```
 
-**Train**
+**训练**
 
-to train the Rural-road-division-model, you can enter
+你可以输入下列代码开始训练模型
 
 ```bash
 python train.py
 ```
 
-you can set the train config in the config.json
+你可以在 config.json 中设置本次训练的属性
 
 ```json
 {
@@ -135,9 +135,9 @@ you can set the train config in the config.json
 }
 ```
 
-**Log**
+**日志**
 
-you can set the log config in the config.json
+你可以在 config.json 中设置日志的属性
 
 ```json
 {
@@ -149,13 +149,13 @@ you can set the log config in the config.json
 
 **Webui**
 
-to use the webui, you can enter
+你需要输入下列代码来启动你的 webui
 
 ```bash
 python train.py
 ```
 
-you can set the webui config in the config.json
+你可以在 config.json 中设置 webui 的相关信息
 
 ```json
 {
