@@ -110,6 +110,28 @@ model = Model()
 }
 ```
 
+**模型**
+
+你可以在 config.json 中设置模型的属性
+
+```json
+{
+"model":{
+        "PartC":{
+            "img_size" : 256,
+            "patch_size" : 16,
+            "in_channels" : 3,
+            "embed_dim" : 256,
+            "num_heads" : 2,
+            "num_layers" : 2,
+            "mlp_hidden_dim" : 128,
+            "classify_dim" : 128,
+            "output_token_size" : 128
+        }
+    },
+}
+```
+
 **训练**
 
 你可以输入下列代码开始训练模型

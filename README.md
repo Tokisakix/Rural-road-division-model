@@ -110,6 +110,28 @@ and add the dataset's information in the config.json
 }
 ```
 
+**Model**
+
+you can set the model config in the config.json
+
+```json
+{
+"model":{
+        "PartC":{
+            "img_size" : 256,
+            "patch_size" : 16,
+            "in_channels" : 3,
+            "embed_dim" : 256,
+            "num_heads" : 2,
+            "num_layers" : 2,
+            "mlp_hidden_dim" : 128,
+            "classify_dim" : 128,
+            "output_token_size" : 128
+        }
+    },
+}
+```
+
 **Train**
 
 to train the Rural-road-division-model, you can enter

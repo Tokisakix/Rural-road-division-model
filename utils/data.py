@@ -1,6 +1,5 @@
 import torch
 import numpy as np
-from torch.autograd import Variable as V
 from networks.dinknet import DinkNet34
 from torchvision import transforms
 from PIL import Image
@@ -9,14 +8,10 @@ BATCHSIZE_PER_CARD = 4
 
 
 class TTAFrame:
-    """
-    Test-time augmentation framework.
-    Notice : modified to receive tensors as inputs
-    """
-
     def __init__(self, net):
         self.net = net().cuda()
         self.net = torch.nn.DataParallel(self.net, device_ids=range(torch.cuda.device_count()))
+        return
 
     def test_one_img(self, img, evalmode=True):
         if evalmode:
@@ -42,10 +37,10 @@ class TTAFrame:
         img3 = img3.transpose(0, 3, 1, 2)
         img4 = img4.transpose(0, 3, 1, 2)
 
-        img1 = V(torch.Tensor(np.array(img1, np.float32) / 255.0 * 3.2 - 1.6).cuda())
-        img2 = V(torch.Tensor(np.array(img2, np.float32) / 255.0 * 3.2 - 1.6).cuda())
-        img3 = V(torch.Tensor(np.array(img3, np.float32) / 255.0 * 3.2 - 1.6).cuda())
-        img4 = V(torch.Tensor(np.array(img4, np.float32) / 255.0 * 3.2 - 1.6).cuda())
+        img1 = torch.Tensor(np.array(img1, np.float32) / 255.0 * 3.2 - 1.6).cuda()
+        img2 = torch.Tensor(np.array(img2, np.float32) / 255.0 * 3.2 - 1.6).cuda()
+        img3 = torch.Tensor(np.array(img3, np.float32) / 255.0 * 3.2 - 1.6).cuda()
+        img4 = torch.Tensor(np.array(img4, np.float32) / 255.0 * 3.2 - 1.6).cuda()
 
         maska = self.net.forward(img1).squeeze().cpu().data.numpy()
         maskb = self.net.forward(img2).squeeze().cpu().data.numpy()
@@ -70,10 +65,10 @@ class TTAFrame:
         img3 = img3.transpose(0, 3, 1, 2)
         img4 = img4.transpose(0, 3, 1, 2)
 
-        img1 = V(torch.Tensor(np.array(img1, np.float32) / 255.0 * 3.2 - 1.6).cuda())
-        img2 = V(torch.Tensor(np.array(img2, np.float32) / 255.0 * 3.2 - 1.6).cuda())
-        img3 = V(torch.Tensor(np.array(img3, np.float32) / 255.0 * 3.2 - 1.6).cuda())
-        img4 = V(torch.Tensor(np.array(img4, np.float32) / 255.0 * 3.2 - 1.6).cuda())
+        img1 = torch.Tensor(np.array(img1, np.float32) / 255.0 * 3.2 - 1.6).cuda()
+        img2 = torch.Tensor(np.array(img2, np.float32) / 255.0 * 3.2 - 1.6).cuda()
+        img3 = torch.Tensor(np.array(img3, np.float32) / 255.0 * 3.2 - 1.6).cuda()
+        img4 = torch.Tensor(np.array(img4, np.float32) / 255.0 * 3.2 - 1.6).cuda()
 
         maska = self.net.forward(img1).squeeze().cpu().data.numpy()
         maskb = self.net.forward(img2).squeeze().cpu().data.numpy()
@@ -94,10 +89,10 @@ class TTAFrame:
         img4 = np.array(img3)[:, :, ::-1]
         img5 = img3.transpose(0, 3, 1, 2)
         img5 = np.array(img5, np.float32) / 255.0 * 3.2 - 1.6
-        img5 = V(torch.Tensor(img5).cuda())
+        img5 = torch.Tensor(img5).cuda()
         img6 = img4.transpose(0, 3, 1, 2)
         img6 = np.array(img6, np.float32) / 255.0 * 3.2 - 1.6
-        img6 = V(torch.Tensor(img6).cuda())
+        img6 = torch.Tensor(img6).cuda()
 
         maska = self.net.forward(img5).squeeze().cpu().data.numpy()  # .squeeze(1)
         maskb = self.net.forward(img6).squeeze().cpu().data.numpy()
@@ -118,7 +113,7 @@ class TTAFrame:
         img4 = np.array(img3)[:, :, ::-1]
         img5 = np.concatenate([img3, img4]).transpose(0, 3, 1, 2)
         img5 = np.array(img5, np.float32) / 255.0 * 3.2 - 1.6
-        img5 = V(torch.Tensor(img5).cuda())
+        img5 = torch.Tensor(img5).cuda()
 
         mask = self.net.forward(img5).squeeze().cpu().data.numpy()  # .squeeze(1)
         mask1 = mask[:4] + mask[4:, :, ::-1]
@@ -129,6 +124,7 @@ class TTAFrame:
 
     def load(self, path):
         self.net.load_state_dict(torch.load(path))
+        return
 
 
 def process_dataset(img_img, label_img, is_clean):
@@ -150,9 +146,10 @@ def process_dataset(img_img, label_img, is_clean):
     img = Image.open(img_img).convert('RGB')
     label = Image.open(label_img).convert('RGB')
 
-    transform = transforms.Compose(
-        [transforms.Resize((1024, 1024)),
-         transforms.ToTensor()])
+    transform = transforms.Compose([
+        transforms.Resize((1024, 1024)),
+        transforms.ToTensor(),
+    ])
 
     img = transform(img)
     label = transform(label)
@@ -197,10 +194,10 @@ def process_dataset(img_img, label_img, is_clean):
                 if torch.sum(cropped_label) > 0:
                     labeled_patches_count += 1
 
-            print('---')
-            print(cropped_img.shape)
-            print(cropped_label.shape)
-            print('---')
+            # print('---')
+            # print(cropped_img.shape)
+            # print(cropped_label.shape)
+            # print('---')
 
             cropped_imgs.append(cropped_img)
             cropped_labels.append(cropped_label)
