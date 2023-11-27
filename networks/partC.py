@@ -21,6 +21,14 @@ class PatchEmbedding(nn.Module):
         out = self.conv(x)
         return out
     
+class InfoNCE(nn.Module):
+    def __init__(self):
+        super(InfoNCE, self).__init__()
+        return
+    
+    def forward(self, inputs, targets):
+        return
+    
 class PartC(nn.Module):
     def __init__(self, vit_model, classify_model, optimizer, contrast_loss, classify_loss):
         """
@@ -63,7 +71,7 @@ class PartC(nn.Module):
         is_positive -> FloatTensor[batch * 16]
         """
         classes = self.classify(outputs)
-        
+        print("classes.shape", classes.shape)
         return
    
     def train(self, imgs, labels, is_positive): 
@@ -73,7 +81,8 @@ class PartC(nn.Module):
         outputs     -> FloatTensor[batch * 16, 256, 256]
         is_positive -> FloatTensor[batch * 16]
         """
-        print(imgs.shape, labels.shape)
+        print("imgs.shape", imgs.shape)
+        print("labels.shape", labels.shape)
         outputs = self.vit(imgs)
         self.train_contrast_loss(outputs, imgs, labels, is_positive)
         self.train_classify_loss(outputs, imgs, labels, is_positive)
@@ -97,7 +106,7 @@ def get_PartC():
         nn.Sigmoid(),
     )
     optimizer = optim.Adam
-    contrast_loss = nn.CrossEntropyLoss()
+    contrast_loss = InfoNCE()
     classify_loss = nn.BCELoss()
 
     part_c = PartC(
@@ -116,4 +125,4 @@ if __name__ == "__main__":
     
     partC = get_PartC()
     outputs = partC.train(imgs, labels, is_positive)
-    print(outputs.shape)
+    print("tokens.shape", outputs.shape)
