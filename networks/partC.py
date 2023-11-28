@@ -30,7 +30,7 @@ class InfoNCE(nn.Module):
         return
     
 class PartC(nn.Module):
-    def __init__(self, vit_model, classify_model, optimizer, contrast_loss, classify_loss):
+    def __init__(self, vit_model, classify_model, optimizer, contrast_loss, classify_loss, vit_learning_rate, classify_learning_rate):
         """
         vit_model     -> ViTEncoder(
             img_size,
@@ -48,8 +48,8 @@ class PartC(nn.Module):
         super(PartC, self).__init__()
         self.vit = vit_model
         self.classify = classify_model
-        self.optim_vit = optimizer(self.vit.parameters())
-        self.optim_classify = optimizer(self.classify.parameters())
+        self.optim_vit = optimizer(self.vit.parameters(), lr = vit_learning_rate)
+        self.optim_classify = optimizer(self.classify.parameters(), lr = classify_learning_rate)
         self.contrast_loss = contrast_loss
         self.classify_loss = classify_loss
         return
@@ -61,7 +61,8 @@ class PartC(nn.Module):
         outputs     -> FloatTensor[batch * 16, 256, 256]
         is_positive -> FloatTensor[batch * 16]
         """
-        return
+        
+        return 1.8
     
     def train_classify_loss(self, outputs, imgs, labels, is_positive):
         """
@@ -72,7 +73,11 @@ class PartC(nn.Module):
         """
         classes = self.classify(outputs)
         print("classes.shape", classes.shape)
-        return
+        self.optim_classify.zero_grad()
+        loss = self.classify_loss(outputs, is_positive)
+        loss.backward()
+        self.optim_classify.step()
+        return loss.item()
    
     def train(self, imgs, labels, is_positive): 
         """
@@ -84,8 +89,14 @@ class PartC(nn.Module):
         print("imgs.shape", imgs.shape)
         print("labels.shape", labels.shape)
         outputs = self.vit(imgs)
-        self.train_contrast_loss(outputs, imgs, labels, is_positive)
-        self.train_classify_loss(outputs, imgs, labels, is_positive)
+        contrast_loss = self.train_contrast_loss(outputs, imgs, labels, is_positive)
+        classify_loss = self.train_classify_loss(outputs, imgs, labels, is_positive)
+        print("contrast loss", contrast_loss)
+        print("classify loss", classify_loss)
+        return
+    
+    def forward(self, imgs):
+        outputs = self.vit(imgs)
         return outputs
     
 def get_PartC():
@@ -107,7 +118,7 @@ def get_PartC():
     )
     optimizer = optim.Adam
     contrast_loss = InfoNCE()
-    classify_loss = nn.BCELoss()
+    classify_loss = nn.CrossEntropyLoss()
 
     part_c = PartC(
         vit_model,
@@ -115,14 +126,17 @@ def get_PartC():
         optimizer,
         contrast_loss,
         classify_loss,
+        vit_learning_rate = PART_C_CONFIG["vit_learning_rate"],
+        classify_learning_rate = PART_C_CONFIG["classify_learning_rate"],
     )
     return part_c
 
 if __name__ == "__main__":
     imgs        = torch.rand(TEST_BATCH_SIZE * 16, 3, 256, 256)
     labels      = torch.rand(TEST_BATCH_SIZE * 16, 256, 256)
-    is_positive = torch.ones(TEST_BATCH_SIZE * 16)
+    is_positive = torch.ones(TEST_BATCH_SIZE * 16).long()
     
     partC = get_PartC()
-    outputs = partC.train(imgs, labels, is_positive)
+    outputs = partC(imgs)
+    partC.train(imgs, labels, is_positive)
     print("tokens.shape", outputs.shape)
