@@ -9,10 +9,12 @@ class NewLabelGenerator:
     def process_cam(self, cam_images):
         '''
         Process CAM to generate binary labels.
+
         Args:
-        - cam_images: list of CAM images, each of size (256, 256, 3)
+        - cam_images (list): List of CAM images, each of size (256, 256, 3).
+
         Returns:
-        - processed_labels : List of binary labels, each of size (256, 256, 3).
+        - processed_labels (list): List of binary labels, each of size (256, 256, 3).
         '''
         processed_labels = []
 
