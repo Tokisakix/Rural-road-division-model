@@ -2,7 +2,8 @@ import torch.optim as optim
 import os
 import shutil
 
-from utils import load_config, FrameWork
+from framework import FrameWork
+from utils import load_config
 from utils.loader import get_loader
 from utils.logger import LogPrinter
 from utils.model import Model, load_model, save_model
@@ -53,8 +54,6 @@ framework = FrameWork(
     logger = logger,
     train_loader = train_loader,
     test_loader = test_loader,
-    optimizer = optimizer,
-    criterion = criterion,
 )
 
 # 训练

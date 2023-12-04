@@ -1,3 +1,4 @@
+import json
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -82,3 +83,69 @@ class CAMGeneratorNetwork:
 # pretrained_classifier = ...
 # cam_network = CAMGeneratorNetwork(vit_model, pretrained_classifier, input_data, ground_truth_labels)
 # final_cam_output = cam_network.train(num_epochs=10)
+
+class Decoder(nn.Module):
+    def __init__(self, input_token_size, output_channel_nums, output_img_size):
+        super(Decoder, self).__init__()
+        self.func = nn.Linear(128, 3 * 256 * 256)
+        self.input_token_size = input_token_size
+        self.output_channel_nums = output_channel_nums
+        self.output_img_size = output_img_size
+        return
+    
+    def forward(self, tokens):
+        out = self.func(tokens)
+        out = out.reshape(tokens.shape[0], self.output_channel_nums, self.output_img_size, self.output_img_size)
+        return out
+
+class PartD(nn.Module):
+    def __init__(self, model, optimizer, criterion, learning_rate):
+        super(PartD, self).__init__()
+        self.model = model
+        self.optimizer = optimizer(self.model.parameters(), lr = learning_rate)
+        self.criterion = criterion
+        return
+    
+    def train(self, inputs, targets):
+        outputs = self.model(inputs)
+        self.optimizer.zero_grad()
+        loss = self.criterion(outputs, targets)
+        loss.backward()
+        self.optimizer.step()
+        return loss.cpu().item()
+    
+    def forward(self, tokens):
+        out = self.model(tokens)
+        return out
+
+TEST_BATCH_SIZE = 2
+CONFIG_PATH = "config.json"
+
+def load_config():
+    with open(CONFIG_PATH, "r", encoding="utf-8") as file:
+        config = json.load(file)
+    return config
+
+def get_PartD():
+    PART_D_CONFIG = load_config()["model"]["PartD"]
+    model = Decoder(
+        input_token_size = PART_D_CONFIG["input_token_size"],
+        output_channel_nums = PART_D_CONFIG["output_channel_nums"],
+        output_img_size = PART_D_CONFIG["output_img_size"],
+    )
+    part_d = PartD(
+        model = model,
+        optimizer = torch.optim.Adam,
+        criterion = torch.nn.MSELoss(),
+        learning_rate = PART_D_CONFIG["learning_rate"],
+    )
+    return part_d
+
+if __name__ == "__main__":
+    tokens      = torch.rand(TEST_BATCH_SIZE * 16, 128)
+    targets     = torch.rand(TEST_BATCH_SIZE * 16, 3, 256, 256)
+    
+    partd = get_PartD()
+    outputs = partd(tokens)
+    partd.train(tokens, targets)
+    print("outputs.shape", outputs.shape)

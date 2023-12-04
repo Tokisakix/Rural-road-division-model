@@ -1,14 +1,25 @@
+import torch
 from time import perf_counter
 
+from networks.partC import get_PartC
+from networks.partD import get_PartD
+
+class Model(torch.nn.Module):
+    def __init__(self):
+        super(Model, self).__init__()
+        self.part_c = get_PartC()
+        self.part_d = get_PartD()
+        return
+    
+    def forward(self):
+        return
 
 class FrameWork:
-    def __init__(self, model, logger, train_loader, test_loader, optimizer, criterion):
+    def __init__(self, model, logger, train_loader, test_loader):
         self.model = model
         self.logger = logger
         self.train_loader = train_loader
         self.test_loader = test_loader
-        self.optimizer = optimizer
-        self.criterion = criterion
         return
 
     def _optim_(self, image, pos, neg):
