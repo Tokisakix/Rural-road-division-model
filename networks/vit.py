@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 
-from transformer import PatchEmbedding, TransformerEncoderLayer
+from .transformer import PatchEmbedding, TransformerEncoderLayer
 
 class ViTEncoder(nn.Module):
     def __init__(self, img_size, patch_size, in_channels, embed_dim, num_heads, num_layers, mlp_hidden_dim, use_cls=True, dropout=0.5):

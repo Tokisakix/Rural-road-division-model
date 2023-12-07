@@ -1,5 +1,5 @@
 {
-    "cuda":true,
+    "cuda":false,
     "model":{
         "PartC":{
             "img_size" : 256,
@@ -16,7 +16,7 @@
         },
         "PartD":{
             "input_token_size" : 128,
-            "output_channel_nums" : 3,
+            "output_channel_nums" : 1,
             "output_img_size" : 256,
             "learning_rate" : 1e-3
         }

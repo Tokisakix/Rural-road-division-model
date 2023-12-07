@@ -73,22 +73,13 @@ class FinalDataSet(Dataset):
         super(FinalDataSet, self).__init__()
         self.basic_set = basic_set
         self.train = train
-        self.images = torch.rand(32, 3, 1024, 1024)
-        self.pos = torch.rand(32, 1, 1024, 1024)
-        self.neg = torch.rand(32, 1, 1024, 1024) if train else None
         return
 
     def __getitem__(self, index):
-        image = self.images[index]
-        pos = self.pos[index]
-        if not self.train:
-            return image, pos
-        neg = self.neg[index]
-        return image, pos, neg
+        return self.basic_set[index]
 
     def __len__(self):
-        return self.images.shape[0]
-
+        return len(self.basic_set)
 
 # 获取初级数据集
 def get_basic_dataset(data_config):

@@ -2,7 +2,7 @@ import torch
 from torch import nn, optim
 import json
 
-from vit import ViT
+from .vit import ViT
 
 TEST_BATCH_SIZE = 2
 CONFIG_PATH = "config.json"
@@ -72,7 +72,6 @@ class PartC(nn.Module):
         is_positive -> FloatTensor[batch * 16]
         """
         classes = self.classify(outputs)
-        print("classes.shape", classes.shape)
         self.optim_classify.zero_grad()
         loss = self.classify_loss(outputs, is_positive)
         loss.backward()
@@ -86,14 +85,11 @@ class PartC(nn.Module):
         outputs     -> FloatTensor[batch * 16, 256, 256]
         is_positive -> FloatTensor[batch * 16]
         """
-        print("imgs.shape", imgs.shape)
-        print("labels.shape", labels.shape)
         outputs = self.vit(imgs)
         contrast_loss = self.train_contrast_loss(outputs, imgs, labels, is_positive)
         classify_loss = self.train_classify_loss(outputs, imgs, labels, is_positive)
-        print("contrast loss", contrast_loss)
-        print("classify loss", classify_loss)
-        return
+        loss = contrast_loss + classify_loss
+        return loss, outputs
     
     def forward(self, imgs):
         outputs = self.vit(imgs)

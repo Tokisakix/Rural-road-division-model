@@ -6,10 +6,8 @@ import torch.optim as optim
 class Decoder(nn.Module):
     def __init__(self, input_token_size, output_channel_nums, output_img_size):
         super(Decoder, self).__init__()
-        # Flatten the tokens 2 one-dimension
         self.fc = nn.Linear(input_token_size, 128 * 16 * 16)
         self.conv_layers = nn.Sequential(
-            # Upsample
             nn.ConvTranspose2d(128, 64, kernel_size=3, stride=2, padding=1, output_padding=1),
             nn.ReLU(),
             nn.ConvTranspose2d(64, 32, kernel_size=3, stride=2, padding=1, output_padding=1),
@@ -20,10 +18,10 @@ class Decoder(nn.Module):
 
     def forward(self, tokens):
         out = self.fc(tokens)
-        out = out.view(-1, 128, 16, 16)  # Reshape to fit for ConvTranspose2d
+        out = out.view(-1, 128, 16, 16)
         out = self.conv_layers(out)
         out = nn.functional.interpolate(out, size=(
-        self.output_img_size, self.output_img_size))  # Resize to target image size
+        self.output_img_size, self.output_img_size))
         return out
 
 
@@ -41,7 +39,7 @@ class PartD(nn.Module):
         loss = self.criterion(outputs, targets)
         loss.backward()
         self.optimizer.step()
-        return loss.cpu().item()
+        return loss.cpu().item(), outputs
 
     def forward(self, tokens):
         out = self.model(tokens)

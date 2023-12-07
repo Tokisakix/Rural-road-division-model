@@ -30,27 +30,12 @@ os.mkdir(LOG_ROOT)
 logger = LogPrinter(LOG_ROOT, SAVE_NUM)
 logger.log(f"[INFO] Log's root is {LOG_ROOT}.")
 
-# 获取模型
-model = load_model("pretrained/pretrained.pth") if CUDA else Model()
-model = model.cuda() if CUDA else model
-logger.log("[INFO] " + ("Use" if PRETRAINED else "Not") + " pretrained model.")
-logger.log("[INFO] Model train in " + ("CUDA." if CUDA else "CPU."))
-
 # 数据加载器
 train_loader, test_loader = get_loader()
 logger.log("[INFO] Loaded data loader.")
 
-# 优化器
-optimizer = optim.Adam(params=model.parameters(), lr=LR)
-logger.log(f"[INFO] Use {optimizer.__class__.__name__} optimizer.")
-
-# 损失函数
-criterion = DicBceLoss()
-logger.log(f"[INFO] Use {criterion.__class__.__name__} criterion.")
-
 # 定义框架
 framework = FrameWork(
-    model = model,
     logger = logger,
     train_loader = train_loader,
     test_loader = test_loader,

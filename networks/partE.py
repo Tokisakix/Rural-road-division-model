@@ -1,6 +1,7 @@
 import numpy as np
 import cv2
 import matplotlib.pyplot as plt
+import torch
 
 class NewLabelGenerator:
     def __init__(self):
@@ -72,3 +73,30 @@ class NewLabelGenerator:
 #
 # new_label = new_label_generator.assemble(processed_labels)
 # new_label_generator.visualize_label(new_label)
+
+class PartE(torch.nn.Module):
+    def __init__(self, patch_num) -> None:
+        super(PartE, self).__init__()
+        self.patch_num = patch_num
+        return
+    
+    def forward(self, imgs):
+        imgs = imgs.permute(0, 2, 3, 1)
+        (b, w, h, c) = imgs.shape
+        imgs = imgs.reshape(b // self.patch_num, w * int(self.patch_num ** 0.5), h * int(self.patch_num ** 0.5), c)
+        imgs = imgs.permute(0, 3, 1, 2)
+        return imgs
+    
+def get_PartE():
+    parte = PartE(
+        patch_num = 16,
+    )
+    return parte
+
+if __name__ == "__main__":
+    inputs = torch.rand(32, 3, 256, 256)
+
+    print("inputs.shape", inputs.shape)
+    parte = get_PartE()
+    outputs = parte(inputs)
+    print("outputs.shape", outputs.shape)

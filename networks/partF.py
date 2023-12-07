@@ -2,7 +2,10 @@ import torch
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 
 class LabelValidator:
-    def __init__(self, ground_truth, predictions):
+    def __init__(self):
+        return
+
+    def run(self, ground_truth, predictions):
         '''
         Initializes the CAMValidator with ground truth and predicted labels, each of shape (1024, 1024, 3).
         '''
@@ -53,3 +56,7 @@ class LabelValidator:
 # precision = validator.calculate_precision()
 # recall = validator.calculate_recall()
 # f1 = validator.calculate_f1_score()
+
+def get_PartF():
+    partf = LabelValidator()
+    return partf
