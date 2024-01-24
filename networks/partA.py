@@ -1,6 +1,6 @@
 import torch
 import numpy as np
-from networks.dinknet import DinkNet34
+from networks.dinknet import DinkNet34,DinkNet34_less_pool
 from torchvision import transforms
 from PIL import Image
 import cv2 as cv
@@ -235,14 +235,14 @@ def process_dataset(image_, mask_, source_folder, save_folder, unusual_percent, 
 
         total_patches_count += 1
 
-        # using a pre-trained D-LinkNet34 model for label prediction
+        # using a pre-trained DinkNet34_less_pool model for label prediction
         if torch.sum(cropped_label) > 0:
             labeled_patches_count += 1
             cv.imwrite(save_folder + f'{ids[m]}' + mask_, label.astype(np.uint8))
 
         elif not is_clean:
-            solver = TTAFrame(DinkNet34)
-            solver.load('/public/zjj/public/zjj/jy/work1/weights/small_log01_dinknet34_deepglo.th')
+            solver = TTAFrame(DinkNet34_less_pool)
+            solver.load('../weights/small_log01_dinknet34lp_deepglo.th')
             mask = solver.test_one_img(img)
             mask[mask > 4.0] = 255
             mask[mask <= 4.0] = 0
