@@ -1,4 +1,5 @@
 import torch
+from torch import nn
 import numpy as np
 from networks.dinknet import DinkNet34,DinkNet34_less_pool
 from torchvision import transforms

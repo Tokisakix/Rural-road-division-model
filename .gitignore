@@ -1,3 +1,7 @@
+log/
+*.pyc
+*.txt
+
 # ignore the weights
 *.th
 

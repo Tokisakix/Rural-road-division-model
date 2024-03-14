@@ -4,6 +4,7 @@ class PatchEmbedding(nn.Module):
     def __init__(self, patch_size, in_channels, embed_dim):
         super(PatchEmbedding, self).__init__()
         self.conv = nn.Conv2d(in_channels, embed_dim, kernel_size=patch_size, stride=patch_size)
+        return
 
     def forward(self, x):
         out = self.conv(x)

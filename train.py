@@ -1,7 +1,7 @@
 import torch.optim as optim
 import os
 import shutil
-
+#os.environ["CUDA_VISIBLE_DEVICES"] = '1,2,3'
 from framework import FrameWork
 from utils import load_config
 from utils.loader import get_loader
@@ -39,6 +39,8 @@ framework = FrameWork(
     logger = logger,
     train_loader = train_loader,
     test_loader = test_loader,
+    CUDA = CUDA,
+    Devices=[0],
 )
 
 # 训练

@@ -1,5 +1,5 @@
 {
-    "cuda":false,
+    "cuda":true,
     "model":{
         "PartC":{
             "img_size" : 256,
@@ -25,22 +25,22 @@
         {
             "name":"croproad",
             "use":true,
-            "train_root":"data/croproad_dataset/train/",
-            "test_root":"data/croproad_dataset/test/",
-            "image_":"_1.png",
-            "mask_":"_1 (2).png"
+            "train_root":"dataset/dataset/osm256_ori/train",
+            "test_root":"dataset/dataset/osm256_ori/test",
+            "image_":"sat.png",
+            "mask_":"mask.png"
         },
         {
             "name":"deepglobal",
-            "use":true,
-            "train_root":"data/deepglobal/train/",
-            "test_root":"data/deepglobal/test/",
-            "image_":"_sat.jpg",
-            "mask_":"_mask.png"
+            "use":false,
+            "train_root":"data/croproad_mini/test",
+            "test_root":"data/croproad_mini/train",
+            "image_":"sat.jpg",
+            "mask_":"mask.png"
         }
     ],
     "train":{
-        "name":"ViT_v1",
+        "name":"Ours_v9",
         "pretrained":false,
         "train_batch_size":4,
         "test_batch_size":4,
@@ -48,8 +48,12 @@
         "learning_rate":1e-3,
         "show_info_step":8,
         "test_info_step":8,
-        "save_model_step":8,
-        "save_model_num":4
+        "save_model_step":2,
+        "save_model_num":1
+    },
+    "test":{
+        "source_root": "dataset/dataset/osm256_ori/test/",
+        "target_file": "submit/ours_v6/"
     },
     "log":{
         "root":"log/"
@@ -57,6 +61,6 @@
     "webui":{
         "share":false,
         "port":8080,
-        "model_path":"models/model.pth"
+        "model_path":"log/Ours_v9/_16838_.pth"
     }
 }

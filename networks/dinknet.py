@@ -190,10 +190,23 @@ class DinkNet34_less_pool(nn.Module):
 
         return F.sigmoid(out)
 
+class Model(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.module = DinkNet34()
+        return
+    
+    def forward(self, x):
+        x = self.module(x)
+        return x
+
 if __name__ == "__main__":
-    model   = DinkNet34()
+    model   = Model()
+    print(torch.load("models/dinknet34.th"))
+    model.load_state_dict(torch.load("models/dinknet34.th"))
     inputs  = torch.rand(4, 3, 1024, 1024)
     outputs = model(inputs)
     print(model)
     print("inputs's shape : ", inputs.shape)
     print("outputs's shape: ", outputs.shape)
+    torch.save(model, "models/DinkNet34.pth")

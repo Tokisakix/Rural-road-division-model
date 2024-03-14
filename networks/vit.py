@@ -50,7 +50,7 @@ if __name__ == "__main__":
     num_heads = 4
     num_layers = 4
     mlp_hidden_dim = 1024
-    num_classes = 1000
+    num_classes = 1000  # 2
     use_cls = False
 
     # model   = ViTEncoder(img_size, patch_size, in_channels, embed_dim, num_heads, num_layers, mlp_hidden_dim, use_cls)
@@ -59,4 +59,5 @@ if __name__ == "__main__":
     outputs = model(inputs)
     print(model)
     print("inputs's shape : ", inputs.shape)
-    print("outputs's shaoe: ", outputs.shape)
+    print("outputs's shape: ", outputs.shape)
+    print("output:",outputs)

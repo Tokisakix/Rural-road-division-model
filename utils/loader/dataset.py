@@ -56,8 +56,8 @@ class ImageFolder(Dataset):
 
     def __getitem__(self, index):
         idx = self.ids[index]
-        img_path = f"{self.root}\{idx}{self.image_}"
-        mask_path = f"{self.root}\{idx}{self.mask_}"
+        img_path = f"{self.root}/{idx}{self.image_}"
+        mask_path = f"{self.root}/{idx}{self.mask_}"
         img, mask = self.loader(img_path, mask_path)
         img = torch.Tensor(img)
         mask = torch.Tensor(mask)
@@ -71,7 +71,19 @@ class ImageFolder(Dataset):
 class FinalDataSet(Dataset):
     def __init__(self, basic_set, train):
         super(FinalDataSet, self).__init__()
-        self.basic_set = basic_set
+        self.basic_set = []
+        for imgs, masks in basic_set:
+            temp_img  = []
+            temp_mask = []
+            imgs  = torch.split(imgs, 256, 1)
+            masks = torch.split(masks, 256, 1)
+            for img, mask in zip(imgs, masks):
+                for _img, _mask in zip(torch.split(img, 256, 2), torch.split(mask, 256, 2)):
+                    temp_img.append(_img)
+                    temp_mask.append(_mask)
+            res_img  = torch.stack(temp_img, dim=0)
+            res_mask = torch.stack(temp_mask, dim=0)
+            self.basic_set.append((res_img, res_mask))
         self.train = train
         return
 

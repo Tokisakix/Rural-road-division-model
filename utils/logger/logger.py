@@ -23,6 +23,7 @@ class LogPrinter:
     def save(self, model, step):
         SAVE_PATH = self.log_root + f"/_{step}_.pth"
         torch.save(model, SAVE_PATH)
+        print("sucess",SAVE_PATH)
         self.model_num += 1
         self.model_name.append(SAVE_PATH)
         if self.model_num > self.save_num:
