@@ -2,11 +2,9 @@ import torch
 import gradio as gr
 import numpy as np
 import cv2 as cv
-from torch.nn import Linear
 
-from utils import load_config
-from utils.model import load_model
-from networks.dinknet import Dblock, DecoderBlock, DinkNet34, Model
+from load_config import load_config
+from model import Unet
 
 CONFIG     = load_config()
 CUDA       = CONFIG["cuda"]
@@ -14,7 +12,8 @@ WEBUI      = CONFIG["webui"]
 SHARE      = WEBUI["share"]
 PORT       = WEBUI["port"]
 MODEL_PATH = WEBUI["model_path"]
-MODEL      = load_model(MODEL_PATH)
+MODEL      = torch.load(MODEL_PATH)
+MODEL      = MODEL.cuda() if CUDA else MODEL
 
 def predict(image):
     image = cv.cvtColor(image, cv.COLOR_BGR2RGB) / 255
@@ -28,10 +27,6 @@ def predict(image):
     # out[out <= 0.5] = 0
     return out
 
-# image = cv.imread("/public/zjj/public/zjj/jy/work5/data/croproad_dataset/test/tvbz21m600c2_1 (2).png")
-# predict(image)
-# print("ok")
 interface = gr.Interface(fn=predict, inputs="image", outputs="image")
 
 interface.launch(share=SHARE, server_port=PORT)
-

@@ -1,66 +1,29 @@
 {
-    "cuda":true,
-    "model":{
-        "PartC":{
-            "img_size" : 256,
-            "patch_size" : 16,
-            "in_channels" : 3,
-            "embed_dim" : 256,
-            "num_heads" : 2,
-            "num_layers" : 2,
-            "mlp_hidden_dim" : 128,
-            "classify_dim" : 128,
-            "output_token_size" : 128,
-            "vit_learning_rate" : 1e-3,
-            "classify_learning_rate" : 1e-3
-        },
-        "PartD":{
-            "input_token_size" : 128,
-            "output_channel_nums" : 1,
-            "output_img_size" : 256,
-            "learning_rate" : 1e-3
-        }
+    "cuda": true,
+    "log": {
+        "root": "log/",
+        "save_num": 1
     },
-    "data":[
-        {
-            "name":"croproad",
-            "use":true,
-            "train_root":"dataset/dataset/osm256_ori/train",
-            "test_root":"dataset/dataset/osm256_ori/test",
-            "image_":"sat.png",
-            "mask_":"mask.png"
-        },
-        {
-            "name":"deepglobal",
-            "use":false,
-            "train_root":"data/croproad_mini/test",
-            "test_root":"data/croproad_mini/train",
-            "image_":"sat.jpg",
-            "mask_":"mask.png"
-        }
-    ],
-    "train":{
-        "name":"Ours_v9",
-        "pretrained":false,
-        "train_batch_size":4,
-        "test_batch_size":4,
-        "train_epochs":10,
-        "learning_rate":1e-3,
-        "show_info_step":8,
-        "test_info_step":8,
-        "save_model_step":2,
-        "save_model_num":1
+    "data": {
+        "cuda": false,
+        "download": true,
+        "root": "data/"
     },
-    "test":{
-        "source_root": "dataset/dataset/osm256_ori/test/",
-        "target_file": "submit/ours_v6/"
+    "dataloader": {
+        "clean_batch_size": 1,
+        "raw_batch_size": 1
     },
-    "log":{
-        "root":"log/"
+    "train": {
+        "epochs":100,
+        "learning_rate": 1e-3
     },
-    "webui":{
-        "share":false,
-        "port":8080,
-        "model_path":"log/Ours_v9/_16838_.pth"
+    "show": {
+        "seg_loss_img": "seg_loss_img.jpg",
+        "classifer_loss_img": "classifer_loss_img.jpg"
+    },
+    "webui": {
+        "share": false,
+        "port": 8080,
+        "model_path": "model/index.pth"
     }
 }
