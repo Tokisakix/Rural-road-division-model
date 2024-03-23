@@ -4,7 +4,7 @@ import numpy as np
 import cv2 as cv
 
 from load_config import load_config
-from model import Unet
+from network import Unet
 
 CONFIG     = load_config()
 CUDA       = CONFIG["cuda"]

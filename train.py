@@ -8,8 +8,9 @@ import os
 from load_config import load_config
 from data import get_dataset, Model
 from dataloader import get_dataloader
-from model import Unet, Classifer
-from model import DinkNet34, Dblock, DeConvBn, DecoderBlock
+from network import DeConvBn, ConvBn, Unet, Classifer
+from network import DinkNet34, Dblock, DecoderBlock
+from network import ViTEncoder, ViT
 from logger import Logger
 
 CONFIG        = load_config()
@@ -83,7 +84,8 @@ def train(model, classifer, seg_optimizer, seg_ceriterion, classifer_optimizer, 
             score = raw_predict[idx]
             mask  = raw_outputs[idx]
             if score > clean.item():
-                raw_dataloader.dataset.update(index, image, mask, score, label_path)
+                # raw_dataloader.dataset.update(index, image, mask, score, label_path)
+                pass
 
     logger.info("Finished training!")
     return  epoch_list, seg_loss_list, classifer_loss_list

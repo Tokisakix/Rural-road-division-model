@@ -29,7 +29,7 @@ class DataSet(Dataset):
         self.dinknet = torch.load("model/DinkNet34.pth")
         self.dinknet = self.dinknet.cuda() if CUDA else self.dinknet
         for idx in tqdm(range(8)):
-            img_path   = f"{root}/{'clean' if clean else 'raw'}/image/{idx}.png"
+            img_path   = f"{root}/{'clean' if clean else 'raw'}/image/{idx}.jpg"
             label_path = f"{root}/{'clean' if clean else 'raw'}/label/{idx}.png"
             image = cv.imread(img_path)
             image = cv.cvtColor(image, cv.COLOR_BGR2RGB)
