@@ -128,7 +128,9 @@ if __name__ == "__main__":
     seg_ceriterion       = nn.BCEWithLogitsLoss()
     classifer_ceriterion = nn.MSELoss()
 
-    epoch_list, loss_list, seg_classifer_list = train(model, classifer, seg_optimizer, seg_ceriterion, classifer_optimizer, classifer_ceriterion, clean_dataloader, raw_dataloader, logger)
+    epoch_list, loss_list, seg_classifer_list = train(model, classifer, seg_optimizer, seg_ceriterion,
+                                                      classifer_optimizer, classifer_ceriterion, clean_dataloader,
+                                                      raw_dataloader, logger)
     draw(epoch_list, loss_list, seg_classifer_list)
     clean_dataset.save()
     raw_dataset.save()

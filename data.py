@@ -6,7 +6,7 @@ import cv2 as cv
 from tqdm import tqdm
 
 from load_config import load_config
-from model import DinkNet34, Dblock, DeConvBn, DecoderBlock
+from network.DinkNet import DinkNet34, Dblock, DecoderBlock
 
 class Model(nn.Module):
     def __init__(self):
@@ -26,7 +26,8 @@ class DataSet(Dataset):
         self.transforms = torchvision.transforms.Compose([
             torchvision.transforms.ToTensor(),
         ])
-        self.dinknet = torch.load("model/DinkNet34.pth")
+        self.dinknet = DinkNet34()
+        self.dinknet.load_state_dict(torch.load("model/DinkNet34.th"), strict=False)
         self.dinknet = self.dinknet.cuda() if CUDA else self.dinknet
         for idx in tqdm(range(8)):
             img_path   = f"{root}/{'clean' if clean else 'raw'}/image/{idx}.jpg"

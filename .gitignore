@@ -1,3 +1,16 @@
+# ignore cache
 log/
 *.pyc
+
+# ignore weights
 *.pth
+*.th
+
+# ignore idea settings
+.idea/
+
+# ignore virtenv
+env/
+
+# ignore test files
+test.py
