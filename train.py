@@ -27,7 +27,17 @@ SHOW_CONFIG   = CONFIG["show"]
 SEG_LOSS_IMG  = os.path.join(logger.root, SHOW_CONFIG["seg_loss_img"])
 CLASSIFER_LOSS_IMG  = os.path.join(logger.root, SHOW_CONFIG["classifer_loss_img"])
 
-def train(model, classifer, seg_optimizer, seg_ceriterion, classifer_optimizer, classifer_ceriterion, clean_dataloader, raw_dataloader, logger):
+# FIXME.对比损失的计算实现
+# 其中三个参数均为
+# torch.FloatTensor[1, 1, 1024, 1024]
+def cal_Contra_loss(image, pos_image, neg_image):
+    loss = 0.0
+    print(image.shape)
+    print(pos_image.shape)
+    print(neg_image.shape)
+    return loss
+
+def train(model, classifer, cam, seg_optimizer, seg_ceriterion, classifer_optimizer, classifer_ceriterion, clean_dataloader, raw_dataloader, logger):
     start = perf_counter()
     tot_seg_loss = 0
     tot_classifer_loss = 0
@@ -45,8 +55,13 @@ def train(model, classifer, seg_optimizer, seg_ceriterion, classifer_optimizer, 
 
             clean_outputs = model(clean_inputs)
             raw_outputs   = model(raw_inputs)
+            image         = clean_outputs
+            # FIXME.用于对比学习的正负样本来源，暂时选择对应的干净标签为正样本、不干净输入的模型预测为负样本
+            # 此处如有更好的样本选择方案可以修改，目前选择方案还算科学(
+            pos_image     = clean_labels
+            neg_image     = raw_outputs
             seg_optimizer.zero_grad()
-            seg_loss = seg_ceriterion(clean_outputs, clean_labels)
+            seg_loss = seg_ceriterion(clean_outputs, clean_labels) + cal_Contra_loss(image, pos_image, neg_image)
             seg_loss.backward()
             tot_seg_loss += seg_loss.cpu().item()
             seg_optimizer.step()
@@ -106,7 +121,6 @@ def draw(epoch_list, seg_loss_list, seg_classifer_list):
 
 
 
-
 if __name__ == "__main__":
     logger.info("Logger init.")
 
@@ -127,10 +141,13 @@ if __name__ == "__main__":
     classifer_optimizer  = optim.Adam(classifer.parameters(), lr=LEARNING_RATE)
     seg_ceriterion       = nn.BCEWithLogitsLoss()
     classifer_ceriterion = nn.MSELoss()
+    # FIXME.CAM 模型的实现
+    # cam 目前已作为参数传入到 train() 函数中，具体用法依据之前讨论还未定下，故目前 CAM 在 train() 函数中是零作用
+    cam                  = None
 
-    epoch_list, loss_list, seg_classifer_list = train(model, classifer, seg_optimizer, seg_ceriterion,
+    epoch_list, loss_list, seg_classifer_list = train(model, classifer, cam, seg_optimizer, seg_ceriterion,
                                                       classifer_optimizer, classifer_ceriterion, clean_dataloader,
                                                       raw_dataloader, logger)
     draw(epoch_list, loss_list, seg_classifer_list)
-    clean_dataset.save()
-    raw_dataset.save()
+    # clean_dataset.save()
+    # raw_dataset.save()

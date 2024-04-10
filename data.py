@@ -1,3 +1,4 @@
+import os
 import torch
 import torchvision
 from torch import nn
@@ -34,7 +35,7 @@ class DataSet(Dataset):
             label_path = f"{root}/{'clean' if clean else 'raw'}/label/{idx}.png"
             image = cv.imread(img_path)
             image = cv.cvtColor(image, cv.COLOR_BGR2RGB)
-            label = cv.imread(label_path, cv.IMREAD_GRAYSCALE) if clean else None
+            label = cv.imread(label_path, cv.IMREAD_GRAYSCALE) if os.path.isfile(label_path) else None
             image = self.transforms(image)
             label = self.transforms(label) if clean else self.dinknet(image.unsqueeze(0).cuda() if CUDA else image.unsqueeze(0)).squeeze(0).cpu()
             self.dataset.append((image, label, torch.tensor([1.0] if clean else [0.0]), label_path))
@@ -84,5 +85,5 @@ if __name__ == "__main__":
     print(train_dataset, len(train_dataset))
     print(test_dataset,  len(test_dataset))
 
-    train_dataset.save()
-    test_dataset.save()
+    # train_dataset.save()
+    # test_dataset.save()
