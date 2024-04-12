@@ -1,5 +1,6 @@
 import torch
 from torch import nn, optim
+import torch.nn.functional as F
 import matplotlib.pyplot as plt
 from tqdm import tqdm
 from time import perf_counter
@@ -28,14 +29,25 @@ SEG_LOSS_IMG  = os.path.join(logger.root, SHOW_CONFIG["seg_loss_img"])
 CLASSIFER_LOSS_IMG  = os.path.join(logger.root, SHOW_CONFIG["classifer_loss_img"])
 
 # FIXME.对比损失的计算实现
-# 其中三个参数均为
-# torch.FloatTensor[1, 1, 1024, 1024]
-def cal_Contra_loss(image, pos_image, neg_image):
-    loss = 0.0
-    print(image.shape)
-    print(pos_image.shape)
-    print(neg_image.shape)
+# 输入：torch.FloatTensor[1, 1, 1024, 1024]
+def cal_Contra_loss(image, pos_image, neg_image, margin=0.1):
+    image = image.squeeze(1)  # [1, 1024, 1024]
+    pos_image = pos_image.squeeze(1)
+    neg_image = neg_image.squeeze(1)
+
+    image = image.view(1, -1)  # [1, 1024*1024]
+    pos_image = pos_image.view(1, -1)
+    neg_image = neg_image.view(1, -1)
+
+    pos_sim = F.cosine_similarity(image, pos_image)
+    neg_sim = F.cosine_similarity(image, neg_image)
+
+    # 构造损失函数，使正样本相似度尽可能 > 负样本相似度 + 常量margin
+    # 只惩罚neg_sim - pos_sim + margin > 0时的情况
+    loss = F.relu(neg_sim - pos_sim + margin)
+
     return loss
+
 
 def train(model, classifer, cam, seg_optimizer, seg_ceriterion, classifer_optimizer, classifer_ceriterion, clean_dataloader, raw_dataloader, logger):
     start = perf_counter()
