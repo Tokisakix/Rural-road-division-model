@@ -13,4 +13,4 @@ log/
 env/
 
 # ignore test files
-test.py
+test/
