@@ -10,6 +10,9 @@ import torch.nn.functional as F
 from PIL import Image
 from network.Unet import Unet
 
+torch.backends.cudnn.enabled = False
+
+
 class GradCAM:
     def __init__(self, model, target_layer):
         self.model = model
@@ -33,6 +36,7 @@ class GradCAM:
 
         # 如果没有指定类别，则选择得分最高的类别
         if class_idx is None:
+            print(outputs.shape)
             class_idx = torch.argmax(outputs, 1).item()
 
         # 清除梯度
@@ -55,7 +59,7 @@ class GradCAM:
 
         # 上采样
         cam = F.interpolate(cam,
-                            size=(224, 224),
+                            size=(1024, 1024),
                             mode='bilinear',
                             align_corners=False)
         cam = cam.squeeze().cpu().numpy()
@@ -66,17 +70,18 @@ class GradCAM:
 
 
 # 加载模型
-model = torch.load('log/2024-03-31-15-03-36/Epoch_500_Classifer.pth')
+model = torch.load('log/2024-04-13-12-28-19/Epoch_562_Classifer.pth').cuda(device=1)
 
-image_path = 'data/clean/image/0.png'
+image_path = 'data-road/clean/image/1.jpg'
 image = Image.open(image_path)
 
 preprocess = transforms.Compose([
-    transforms.Resize((224, 224)),
+    transforms.Resize((1024, 1024)),
+    transforms.Grayscale(num_output_channels=1),
     transforms.ToTensor(),
 ])
 
-input_tensor = preprocess(image).unsqueeze(0).cuda()  # [1, 3, 224, 224]
+input_tensor = preprocess(image).unsqueeze(0).cuda(device=1)  # [1, 3, 224, 224]
 # print(input_tensor.shape)
 
 # 选择比较靠近输出的卷积层
