@@ -31,9 +31,9 @@ class DataSet(Dataset):
         self.dinknet = DinkNet34()
         self.dinknet.load_state_dict(torch.load("model/DinkNet34.th"), strict=False)
         self.dinknet = self.dinknet.cuda() if CUDA else self.dinknet
-        for idx in tqdm(range(128)):
-            img_path   = f"{root}/{'clean' if clean else 'raw'}/image/{idx}.jpg"
-            label_path = f"{root}/{'clean' if clean else 'raw'}/label/{idx}.png"
+        for idx in tqdm(range(2048)):
+            img_path   = f"{root}/{'clean' if clean else 'raw'}/image/{idx + 1}.jpg"
+            label_path = f"{root}/{'clean' if clean else 'raw'}/label/{idx + 1}.png"
             image = cv.imread(img_path)
             image = cv.cvtColor(image, cv.COLOR_BGR2RGB)
             label = cv.imread(label_path, cv.IMREAD_GRAYSCALE) if os.path.isfile(label_path) else None

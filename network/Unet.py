@@ -64,7 +64,7 @@ class Unet(nn.Module):
         out = self.conv10(out)
         return out
 
-class Classifer(nn.Module):
+class Classifier(nn.Module):
     def __init__(self, in_channel=1, classes_num=2, p=0.5):
         super().__init__()
         self.conv1 = ConvBn(in_channel, 8)
@@ -72,17 +72,23 @@ class Classifer(nn.Module):
         self.conv3 = ConvBn(16, 32)
         self.linear = nn.Sequential(
             nn.Flatten(),
-            nn.Linear(in_features=32 * 16 * 16, out_features=128),
+            # 1024 * 1024
+            # nn.Linear(in_features=32 * 16 * 16, out_features=128),
+            # 256 * 256
+            nn.Linear(in_features=32 * 4 * 4, out_features=128),
             nn.ReLU(), nn.Dropout(p),
-            nn.Linear(in_features=128, out_features=classes_num),
+            nn.Linear(in_features=128, out_features=32),
+            nn.ReLU(), nn.Dropout(p),
+            nn.Linear(in_features=32, out_features=classes_num),
             nn.Sigmoid(),
         )
         return
     
     def forward(self, x):
-        out = F.max_pool2d(self.conv1(x), kernel_size=(4, 4), stride=4)
+        out = F.max_pool2d(self.conv1(x),   kernel_size=(4, 4), stride=4)
         out = F.max_pool2d(self.conv2(out), kernel_size=(4, 4), stride=4)
         out = F.max_pool2d(self.conv3(out), kernel_size=(4, 4), stride=4)
+        # print(out.shape)
         out = self.linear(out)
         return out
     
@@ -97,7 +103,7 @@ if __name__ == "__main__":
 
     inputs    = torch.randn(4, 3, 1024, 1024)
     unet      = Unet()
-    classifer = Classifer(in_channel=1, classes_num=1)
+    classifer = Classifier(in_channel=1, classes_num=1)
 
     inputs    = inputs.cuda() if CUDA else inputs
     model     = unet.cuda() if CUDA else unet

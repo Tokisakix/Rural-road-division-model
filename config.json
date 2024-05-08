@@ -7,20 +7,20 @@
     "data": {
         "cuda": false,
         "download": true,
-        "root": "data-road"
+        "root": "data-road-clipped"
     },
     "dataloader": {
-        "clean_batch_size": 2,
-        "raw_batch_size": 2
+        "clean_batch_size": 64,
+        "raw_batch_size":64
     },
     "train": {
-        "epochs": 5,
-        "learning_rate": 1e-3
+        "epochs": 100,
+        "learning_rate": 5e-4
     },
     "show": {
         "seg_loss_img": "seg_loss_img.jpg",
         "cta_loss_img": "cta_loss_img.jpg",
-        "classifer_loss_img": "classifer_loss_img.jpg"
+        "classifier_loss_img": "classifier_loss_img.jpg"
     },
     "webui": {
         "share": false,

@@ -21,12 +21,12 @@ class Logger():
         print(info)
         return
     
-    def save_model(self, seg_model, classifer, save_name_seg, save_name_classifer):
-        seg_path       = os.path.join(self.root, save_name_seg)
-        classifer_path = os.path.join(self.root, save_name_classifer)
+    def save_model(self, seg_model, classifier, save_name_seg, save_name_classifier):
+        seg_path        = os.path.join(self.root, save_name_seg)
+        classifier_path = os.path.join(self.root, save_name_classifier)
         torch.save(seg_model, seg_path)
-        torch.save(classifer, classifer_path)
-        self.save_path.append((seg_path, classifer_path))
+        torch.save(classifier, classifier_path)
+        self.save_path.append((seg_path, classifier_path))
         if len(self.save_path) > self.save_num:
             os.remove(self.save_path[0][0])
             os.remove(self.save_path[0][1])
