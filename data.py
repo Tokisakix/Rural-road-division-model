@@ -1,13 +1,16 @@
 import os
 import torch
 import torchvision
-from torch import nn
-from torch.utils.data import Dataset
 import cv2 as cv
-from tqdm import tqdm
 
+from torch import nn
+from tqdm import tqdm
+from load_config import load_config
 from load_config import load_config
 from network.DinkNet import DinkNet34, Dblock, DecoderBlock
+from torch.utils.data import Dataset
+
+CONFIG        = load_config()
 
 class Model(nn.Module):
     def __init__(self):
@@ -20,7 +23,7 @@ class Model(nn.Module):
 
 
 class DataSet(Dataset):
-    def __init__(self, root, clean, CUDA):
+    def __init__(self, root, clean, CUDA, size):
         super().__init__()
         self.dataset = []
         self.clean = clean
@@ -31,7 +34,7 @@ class DataSet(Dataset):
         self.dinknet = DinkNet34()
         self.dinknet.load_state_dict(torch.load("model/DinkNet34.th"), strict=False)
         self.dinknet = self.dinknet.cuda() if CUDA else self.dinknet
-        for idx in tqdm(range(2048)):
+        for idx in tqdm(range(size)):
             img_path   = f"{root}/{'clean' if clean else 'raw'}/image/{idx + 1}.jpg"
             label_path = f"{root}/{'clean' if clean else 'raw'}/label/{idx + 1}.png"
             image = cv.imread(img_path)
@@ -70,6 +73,7 @@ def get_dataset(CONFIG, clean):
         root=DATA_CONFIG["root"],
         clean=clean,
         CUDA=DATA_CONFIG["cuda"],
+        size=DATA_CONFIG["size"]
     )
 
     return dataset

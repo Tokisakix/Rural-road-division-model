@@ -4,12 +4,12 @@ from load_config import load_config
 from data import get_dataset
 
 def get_dataloader(CONFIG, dataset, clean):
-    CONFIG = load_config()
+    CONFIG        = load_config()
     LOADER_CONFIG = CONFIG["dataloader"]
 
     dataloader = DataLoader(
-        dataset=dataset,
-        batch_size=LOADER_CONFIG["clean_batch_size"] if clean else LOADER_CONFIG["raw_batch_size"],
+        dataset   = dataset,
+        batch_size= LOADER_CONFIG["clean_batch_size"] if clean else LOADER_CONFIG["raw_batch_size"],
     )
 
     return dataloader

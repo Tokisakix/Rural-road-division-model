@@ -87,7 +87,7 @@ def train(model, classifier, cam, seg_optimizer, seg_ceriterion, classifier_opti
             seg_loss.backward()
             seg_optimizer.step()
 
-            outputs              = classifier(outputs.detach())
+            outputs              = classifier(inputs)
             classifier_optimizer.zero_grad()
             classifier_loss      = classifier_ceriterion(outputs, isroad)
             classifier_loss.backward()
@@ -101,6 +101,7 @@ def train(model, classifier, cam, seg_optimizer, seg_ceriterion, classifier_opti
         tot_classifier_loss = 0
         time                = perf_counter() - start
         start               = perf_counter()
+
         logger.info("\n------")
         logger.info(f"Epoch:{epoch:3d} Seg Loss:{seg_loss:10.6f} Cta Loss:{cta_loss:10.6f} Classifier Loss:{classifier_loss:10.6f} Time:{time:6.2f}s.")
         logger.save_model(model, classifier, f"Epoch_{epoch}_Seg.pth", f"Epoch_{epoch}_Classifier.pth")
@@ -110,6 +111,7 @@ def train(model, classifier, cam, seg_optimizer, seg_ceriterion, classifier_opti
         cta_loss_list.append(cta_loss)
         classifier_loss_list.append(classifier_loss)
 
+    # FIXME.raw数据集的使用
     # for (raw_idx, raw_inputs, raw_label, raws, raw_label_path) in raw_dataloader:
     #     raw_inputs  = raw_inputs.cuda() if CUDA else raw_inputs
     #     raw_outputs = model(raw_inputs).detach()
@@ -146,20 +148,20 @@ def draw(epoch_list, seg_loss_list, cta_loss_list, seg_classifier_list):
     return
 
 if __name__ == "__main__":
-    logger.info("Logger init.")
+    logger.info("Logger initialized.")
 
     clean_dataset = get_dataset(CONFIG, clean=True)
     # raw_dataset   = get_dataset(CONFIG, clean=False)
 
     clean_dataloader = get_dataloader(CONFIG, clean_dataset, clean=True)
     # raw_dataloader   = get_dataloader(CONFIG, raw_dataset, clean=True)
-    logger.info("Load data.")
+    logger.info("Data loaded.")
 
     model      = Unet()
     classifier = Classifier()
     model      = model.cuda() if CUDA else model
     classifier = classifier.cuda() if CUDA else classifier
-    logger.info("Build model.")
+    logger.info("Model built.")
 
     seg_optimizer         = optim.Adam(model.parameters(), lr=LEARNING_RATE)
     classifier_optimizer  = optim.Adam(classifier.parameters(), lr=LEARNING_RATE)

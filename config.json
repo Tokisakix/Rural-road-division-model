@@ -5,17 +5,18 @@
         "save_num": 1
     },
     "data": {
+        "size": 4096,
         "cuda": false,
         "download": true,
         "root": "data-road-clipped"
     },
     "dataloader": {
-        "clean_batch_size": 64,
-        "raw_batch_size":64
+        "clean_batch_size": 128,
+        "raw_batch_size":128
     },
     "train": {
-        "epochs": 100,
-        "learning_rate": 5e-4
+        "epochs": 2000,
+        "learning_rate": 5e-3
     },
     "show": {
         "seg_loss_img": "seg_loss_img.jpg",

@@ -65,7 +65,7 @@ class Unet(nn.Module):
         return out
 
 class Classifier(nn.Module):
-    def __init__(self, in_channel=1, classes_num=2, p=0.5):
+    def __init__(self, in_channel=3, classes_num=2, p=0.5):
         super().__init__()
         self.conv1 = ConvBn(in_channel, 8)
         self.conv2 = ConvBn(8, 16)
