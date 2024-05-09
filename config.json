@@ -5,27 +5,27 @@
         "save_num": 1
     },
     "data": {
-        "size": 4096,
+        "size": 1024,
         "cuda": false,
         "download": true,
         "root": "data-road-clipped"
     },
     "dataloader": {
-        "clean_batch_size": 128,
-        "raw_batch_size":128
+        "clean_batch_size": 16,
+        "raw_batch_size":16
     },
     "train": {
-        "epochs": 2000,
-        "learning_rate": 5e-3
+        "epochs": 1000,
+        "learning_rate": 5e-4
     },
     "show": {
         "seg_loss_img": "seg_loss_img.jpg",
         "cta_loss_img": "cta_loss_img.jpg",
         "classifier_loss_img": "classifier_loss_img.jpg"
     },
-    "webui": {
+    "infer": {
         "share": false,
         "port": 8080,
-        "model_path": "model/index.pth"
+        "model_path": "/public/zjj/public/zjj/xzx/log/2024-05-08-19-42-09/Epoch_100_Seg.pth"
     }
 }

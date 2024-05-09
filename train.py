@@ -1,19 +1,16 @@
-import numpy as np
+# nohup /public/zjj/anaconda3/envs/py37/bin/python3.7 /public/zjj/public/zjj/xzx/train.py &
+import os
 import torch
-from torch import nn, optim, LongTensor
-import torch.nn.functional as F
+import numpy as np
 import matplotlib.pyplot as plt
+from torch import nn, optim
 from tqdm import tqdm
 from time import perf_counter
-import os
-
-from load_config import load_config
-from data import get_dataset, Model
+from data import get_dataset
 from dataloader import get_dataloader
-from network import DeConvBn, ConvBn, Unet, Classifier
-from network import DinkNet34, Dblock, DecoderBlock
-from network import ViTEncoder, ViT
+from load_config import load_config
 from logger import Logger
+from network import UNet, Classifier
 
 CONFIG        = load_config()
 CUDA          = CONFIG["cuda"]
@@ -30,23 +27,26 @@ SEG_LOSS_IMG  = os.path.join(logger.root, SHOW_CONFIG["seg_loss_img"])
 CTA_LOSS_IMG  = os.path.join(logger.root, SHOW_CONFIG["cta_loss_img"])
 CLASSIFIER_LOSS_IMG  = os.path.join(logger.root, SHOW_CONFIG["classifier_loss_img"])
 
-def cal_Contra_loss(image, isroad):
+GPU           = [0, 1, 2, 3]
+torch.cuda.set_device('cuda:{}'.format(GPU[0]))
+
+def cal_Contra_loss(feature_maps, is_road):
     margin = 0.1
     loss   = 0.0
-    n      = image.shape[0]
+    n      = feature_maps.shape[0]
 
     a_idx = np.arange(n)
     b_idx = np.arange(n)
 
     np.random.shuffle(b_idx)
     for a, b in zip(a_idx, b_idx):
-        a_image = image[a]
-        b_image = image[b]
-        if isroad[a] == isroad[b]:
-            d   = torch.abs(a_image - b_image)
+        a_feature = feature_maps[a]
+        b_feature = feature_maps[b]
+        if is_road[a] == is_road[b]:
+            d   = torch.abs(a_feature - b_feature)
             loss+= d * d
         else:
-            d   = torch.clamp(margin - torch.abs(a_image - b_image), min=0)
+            d   = torch.clamp(margin - torch.abs(a_feature - b_feature), min=0)
             loss+= d * d
     loss = loss.mean() / (2 * n)
     return loss
@@ -59,7 +59,7 @@ def check_road(labels, unusual_percent):
     res = torch.LongTensor(res)
     return res
 
-def train(model, classifier, cam, seg_optimizer, seg_ceriterion, classifier_optimizer, classifier_ceriterion, dataloader, logger):
+def train(backbone, classifier, cam, seg_optimizer, seg_ceriterion, classifier_optimizer, classifier_ceriterion, dataloader, logger):
     start                = perf_counter()
     tot_seg_loss         = 0
     tot_cta_loss         = 0
@@ -72,32 +72,34 @@ def train(model, classifier, cam, seg_optimizer, seg_ceriterion, classifier_opti
     for epoch in range(1, EPOCHS + 1):
         for (idx, inputs, labels, cleans, clean_label_path) in tqdm(dataloader):
             isroad   = check_road(labels, 0.2)
-            inputs   = inputs.cuda() if CUDA else inputs
-            labels   = labels.cuda() if CUDA else labels
-            isroad   = isroad.cuda() if CUDA else isroad
-
-            outputs  = model(inputs)
+            inputs   = inputs.cuda(non_blocking=True) if CUDA else inputs
+            labels   = labels.cuda(non_blocking=True) if CUDA else labels
+            isroad   = isroad.cuda(non_blocking=True) if CUDA else isroad
 
             seg_optimizer.zero_grad()
-            seg_loss      = seg_ceriterion(outputs, labels)
-            tot_seg_loss += seg_loss.cpu().item()
-            cta_loss      = cal_Contra_loss(outputs, isroad)
-            tot_cta_loss += cta_loss.cpu().item()
-            seg_loss     += cta_loss
-            seg_loss.backward()
+            classifier_optimizer.zero_grad()
+
+            features = backbone(inputs)
+            outputs  = classifier(features)
+
+            seg_loss        = seg_ceriterion(features, labels)
+            cta_loss        = cal_Contra_loss(features, isroad)
+            classifier_loss = classifier_ceriterion(outputs, isroad)
+            total_loss      = seg_loss + cta_loss + classifier_loss
+
+            total_loss.backward()
+            classifier_optimizer.step()
             seg_optimizer.step()
 
-            outputs              = classifier(inputs)
-            classifier_optimizer.zero_grad()
-            classifier_loss      = classifier_ceriterion(outputs, isroad)
-            classifier_loss.backward()
+            tot_seg_loss        += seg_loss.cpu().item()
+            tot_cta_loss        += cta_loss.cpu().item()
             tot_classifier_loss += classifier_loss.cpu().item()
-            classifier_optimizer.step()
 
         seg_loss            = tot_seg_loss / len(dataloader)
         cta_loss            = tot_cta_loss / len(dataloader)
         classifier_loss     = tot_classifier_loss / len(dataloader)
         tot_seg_loss        = 0
+        tot_cta_loss        = 0
         tot_classifier_loss = 0
         time                = perf_counter() - start
         start               = perf_counter()
@@ -157,14 +159,14 @@ if __name__ == "__main__":
     # raw_dataloader   = get_dataloader(CONFIG, raw_dataset, clean=True)
     logger.info("Data loaded.")
 
-    model      = Unet()
+    model      = UNet()
     classifier = Classifier()
-    model      = model.cuda() if CUDA else model
-    classifier = classifier.cuda() if CUDA else classifier
+    model      = nn.DataParallel(model.to('cuda:0'), device_ids=GPU, output_device=GPU[0]) if CUDA else model
+    classifier = nn.DataParallel(classifier.to('cuda:0'), device_ids=GPU, output_device=GPU[0]) if CUDA else classifier
     logger.info("Model built.")
 
     seg_optimizer         = optim.Adam(model.parameters(), lr=LEARNING_RATE)
-    classifier_optimizer  = optim.Adam(classifier.parameters(), lr=LEARNING_RATE)
+    classifier_optimizer  = optim.Adam(classifier.parameters(), lr=LEARNING_RATE * 0.1)
     seg_ceriterion        = nn.BCEWithLogitsLoss()
     classifier_ceriterion = nn.CrossEntropyLoss()
     # FIXME.CAM的使用
