@@ -8,14 +8,14 @@
         "size": 1024,
         "cuda": false,
         "download": true,
-        "root": "data-road-clipped"
+        "root": "/public/zjj/public/zjj/xzx/data-road-clipped"
     },
     "dataloader": {
         "clean_batch_size": 16,
         "raw_batch_size":16
     },
     "train": {
-        "epochs": 1000,
+        "epochs": 100,
         "learning_rate": 5e-4
     },
     "show": {
@@ -26,6 +26,6 @@
     "infer": {
         "share": false,
         "port": 8080,
-        "model_path": "/public/zjj/public/zjj/xzx/log/2024-05-08-19-42-09/Epoch_100_Seg.pth"
+        "model_path": "/public/zjj/public/zjj/jy/rural-roadv4/log/2024-05-22-12-54-07/Epoch_100_Seg.pth"
     }
 }

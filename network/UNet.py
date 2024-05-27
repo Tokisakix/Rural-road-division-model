@@ -1,5 +1,74 @@
-from load_config import load_config
-from .unet_parts import *
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+
+
+class DoubleConv(nn.Module):
+    """(convolution => [BN] => ReLU) * 2"""
+
+    def __init__(self, in_channels, out_channels):
+        super().__init__()
+        self.double_conv = nn.Sequential(
+            nn.Conv2d(in_channels, out_channels, kernel_size=3, padding=1),
+            nn.BatchNorm2d(out_channels),
+            nn.ReLU(),
+            nn.Conv2d(out_channels, out_channels, kernel_size=3, padding=1),
+            nn.BatchNorm2d(out_channels),
+            nn.ReLU()
+        )
+
+    def forward(self, x):
+        return self.double_conv(x)
+
+
+class Down(nn.Module):
+    """Downscaling with maxpool then double conv"""
+
+    def __init__(self, in_channels, out_channels):
+        super().__init__()
+        self.maxpool_conv = nn.Sequential(
+            nn.MaxPool2d(2),
+            DoubleConv(in_channels, out_channels)
+        )
+
+    def forward(self, x):
+        return self.maxpool_conv(x)
+
+
+class Up(nn.Module):
+    """Upscaling then double conv"""
+
+    def __init__(self, in_channels, out_channels, bilinear=True):
+        super().__init__()
+
+        # if bilinear, use the normal convolutions to reduce the number of channels
+        if bilinear:
+            self.up = nn.Upsample(scale_factor=2, mode='bilinear', align_corners=True)
+        else:
+            self.up = nn.ConvTranspose2d(in_channels // 2, in_channels // 2, kernel_size=2, stride=2)
+
+        self.conv = DoubleConv(in_channels, out_channels)
+
+    def forward(self, x1, x2):
+        x1 = self.up(x1)
+        # input is CHW
+        diffY = torch.tensor([x2.size()[2] - x1.size()[2]])
+        diffX = torch.tensor([x2.size()[3] - x1.size()[3]])
+
+        x1 = F.pad(x1, [diffX // 2, diffX - diffX // 2,
+                        diffY // 2, diffY - diffY // 2])
+
+        x = torch.cat([x2, x1], dim=1)
+        return self.conv(x)
+
+
+class OutConv(nn.Module):
+    def __init__(self, in_channels, out_channels):
+        super(OutConv, self).__init__()
+        self.conv = nn.Conv2d(in_channels, out_channels, kernel_size=1)
+
+    def forward(self, x):
+        return self.conv(x)
 
 class UNet(nn.Module):
     def __init__(self, n_channels=3, n_classes=1, bilinear=True):
@@ -13,38 +82,38 @@ class UNet(nn.Module):
         self.down2 = Down(128, 256)
         self.down3 = Down(256, 512)
         self.down4 = Down(512, 512)
-        self.up1 = Up(1024, 256, bilinear)
-        self.up2 = Up(512, 128, bilinear)
-        self.up3 = Up(256, 64, bilinear)
-        self.up4 = Up(128, 64, bilinear)
+        self.up1  = Up(1024, 256, bilinear)
+        self.up2  = Up(512, 128, bilinear)
+        self.up3  = Up(256, 64, bilinear)
+        self.up4  = Up(128, 64, bilinear)
         self.outc = OutConv(64, n_classes)
 
     def forward(self, x):
-        with torch.autograd.set_detect_anomaly(True):
-            x1 = self.inc(x)
-            x2 = self.down1(x1)
-            x3 = self.down2(x2)
-            x4 = self.down3(x3)
-            x5 = self.down4(x4)
-            x = self.up1(x5, x4)
-            x = self.up2(x, x3)
-            x = self.up3(x, x2)
-            x = self.up4(x, x1)
-            logits = self.outc(x)
-            return logits
+        x1       = self.inc(x)
+        x2       = self.down1(x1)
+        x3       = self.down2(x2)
+        x4       = self.down3(x3)
+        x5       = self.down4(x4)
+        x        = self.up1(x5, x4)
+        x        = self.up2(x, x3)
+        x        = self.up3(x, x2)
+        x        = self.up4(x, x1)
+        features = x
+        logits   = self.outc(x)
+        return features, logits
 
 class Classifier(nn.Module):
-    def __init__(self, in_channel=1, classes_num=2, p=0.5):
+    def __init__(self, in_channel=64, classes_num=2, p=0.5):
         super().__init__()
-        self.conv1 = DoubleConv(in_channel, 16)
-        self.conv2 = DoubleConv(16, 32)
-        self.conv3 = DoubleConv(32, 64)
+        self.conv1  = DoubleConv(in_channel, 128)
+        self.conv2  = DoubleConv(128, 512)
+        self.conv3  = DoubleConv(512, 1024)
         self.linear = nn.Sequential(
             nn.Flatten(),
             # 1024 * 1024
             # nn.Linear(in_features=32 * 16 * 16, out_features=128),
             # 256 * 256
-            nn.Linear(in_features=64 * 4 * 4, out_features=1024),
+            nn.Linear(in_features=1024 * 4 * 4, out_features=1024),
             nn.ReLU(), nn.Dropout(p, inplace=False),
             nn.Linear(in_features=1024, out_features=64),
             nn.ReLU(), nn.Dropout(p, inplace=False),
@@ -54,12 +123,14 @@ class Classifier(nn.Module):
         return
 
     def forward(self, x):
+        #print(x.shape)
         out = F.max_pool2d(self.conv1(x),   kernel_size=(4, 4), stride=4)
         out = F.max_pool2d(self.conv2(out), kernel_size=(4, 4), stride=4)
         out = F.max_pool2d(self.conv3(out), kernel_size=(4, 4), stride=4)
         # print('---test---')
         # print(out.shape)
         out = self.linear(out)
+        # print(out.shape)
         return out
 
 
@@ -67,19 +138,20 @@ class Classifier(nn.Module):
 # ---TEST---
 
 if __name__ == "__main__":
-    CONFIG  = load_config()
-    CUDA    = CONFIG["cuda"]
+    CUDA       = True
 
-    inputs    = torch.randn(4, 3, 1024, 1024)
-    unet      = UNet()
-    classifer = Classifier(in_channel=1, classes_num=1)
+    inputs     = torch.randn(1, 3, 256, 256)
+    unet       = UNet()
+    classifier = Classifier(in_channel=64, classes_num=2)
 
-    inputs    = inputs.cuda() if CUDA else inputs
-    model     = unet.cuda() if CUDA else unet
-    classifer = classifer.cuda() if CUDA else classifer
+    inputs     = inputs.cuda() if CUDA else inputs
+    model      = unet.cuda() if CUDA else unet
+    classifier = classifier.cuda() if CUDA else classifier
     outputs   = model(inputs)
-    classes   = classifer(outputs)
+    print("output shape: \n", outputs[0].shape)
+    classes    = classifier(outputs[0])
+    print("classes shape: \n", classes.shape)
 
     print(inputs.shape)
-    print(model.eval(), classifer.eval())
-    print(outputs.shape, classes.shape)
+    print(model.eval(), classifier.eval())
+    print(outputs[0].shape, outputs[1].shape, classes.shape)

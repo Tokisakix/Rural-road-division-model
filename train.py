@@ -10,7 +10,9 @@ from data import get_dataset
 from dataloader import get_dataloader
 from load_config import load_config
 from logger import Logger
-from network import UNet, Classifier
+from network.UNet import UNet
+from network.resnet import *
+# from network.DinkNet import *
 
 CONFIG        = load_config()
 CUDA          = CONFIG["cuda"]
@@ -79,10 +81,13 @@ def train(backbone, classifier, cam, seg_optimizer, seg_ceriterion, classifier_o
             seg_optimizer.zero_grad()
             classifier_optimizer.zero_grad()
 
-            features = backbone(inputs)
-            outputs  = classifier(features)
+            features,logits = backbone(inputs)
+            # print("features.shape",features.shape)  #torch.Size([16, 64, 256, 256])
+            # print("logits.shape",logits.shape)   #torch.Size([16, 1, 256, 256])
+            outputs         = classifier(features)
+            # print("outputs.shape",outputs.shape)   #torch.Size([16, 2])
 
-            seg_loss        = seg_ceriterion(features, labels)
+            seg_loss        = seg_ceriterion(logits, labels)
             cta_loss        = cal_Contra_loss(features, isroad)
             classifier_loss = classifier_ceriterion(outputs, isroad)
             total_loss      = seg_loss + cta_loss + classifier_loss
@@ -104,7 +109,7 @@ def train(backbone, classifier, cam, seg_optimizer, seg_ceriterion, classifier_o
         time                = perf_counter() - start
         start               = perf_counter()
 
-        logger.info("\n------")
+        logger.info("------")
         logger.info(f"Epoch:{epoch:3d} Seg Loss:{seg_loss:10.6f} Cta Loss:{cta_loss:10.6f} Classifier Loss:{classifier_loss:10.6f} Time:{time:6.2f}s.")
         logger.save_model(model, classifier, f"Epoch_{epoch}_Seg.pth", f"Epoch_{epoch}_Classifier.pth")
         logger.info(f"Save model as Epoch_{epoch}_Seg.pth | Epoch_{epoch}_Classifier.pth")
@@ -152,6 +157,7 @@ def draw(epoch_list, seg_loss_list, cta_loss_list, seg_classifier_list):
 if __name__ == "__main__":
     logger.info("Logger initialized.")
 
+
     clean_dataset = get_dataset(CONFIG, clean=True)
     # raw_dataset   = get_dataset(CONFIG, clean=False)
 
@@ -160,7 +166,7 @@ if __name__ == "__main__":
     logger.info("Data loaded.")
 
     model      = UNet()
-    classifier = Classifier()
+    classifier = resnet50(num_classes=2) #Classifier()
     model      = nn.DataParallel(model.to('cuda:0'), device_ids=GPU, output_device=GPU[0]) if CUDA else model
     classifier = nn.DataParallel(classifier.to('cuda:0'), device_ids=GPU, output_device=GPU[0]) if CUDA else classifier
     logger.info("Model built.")

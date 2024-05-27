@@ -1,11 +1,11 @@
 import cv2
 import numpy as np
 import torch
+import torchvision.transforms as transforms
 
-backbone   = torch.load('/public/zjj/public/zjj/xzx/log/2024-05-08-22-26-15/Epoch_1000_Seg.pth').to('cuda:1')
-classifier = torch.load('/public/zjj/public/zjj/xzx/log/2024-05-08-22-26-15/Epoch_1000_Classifier.pth').to('cuda:1')
+backbone   = torch.load('log/2024-05-21-21-54-21/Epoch_100_Seg.pth').to('cuda:0')
+classifier = torch.load('log/2024-05-21-21-54-21/Epoch_100_Classifier.pth').to('cuda:0')
 
-# 判断是否多卡训练
 if isinstance(backbone,torch.nn.DataParallel):
         backbone = backbone.module
 
@@ -14,9 +14,15 @@ if isinstance(classifier,torch.nn.DataParallel):
 
 backbone.eval()
 classifier.eval()
+print(classifier)
 
-final_conv = classifier.conv3
-fc_weights = classifier.state_dict()['linear.7.weight'].cpu().numpy()
+#----------resnet152-------
+final_conv = classifier.layer4
+fc_weights = classifier.state_dict()['fc.0.weight'].cpu().numpy()
+
+#----------cnn-------------
+#final_conv = classifier.conv3
+#fc_weights = classifier.state_dict()['linear.7.weight'].cpu().numpy()
 
 def getCAM(feature_conv, weight_softmax, class_idx):
     b, c, h, w = feature_conv.shape
@@ -36,18 +42,19 @@ def hook_feature(module, input, output):
     features_blobs.append(output.data.cpu().numpy())
 
 # 连接到最后一个卷积层
-classifier.conv3.register_forward_hook(hook_feature)
+#----------resnet152-------
+classifier.layer4.register_forward_hook(hook_feature)
+#----------cnn-------------
+# classifier.conv3.register_forward_hook(hook_feature)
 
-img_path = '/public/zjj/public/zjj/xzx/data-road-clipped/clean/image/1000.jpg'
-# img = cv2.imread(img_path)
-img = cv2.imread(img_path,cv2.IMREAD_GRAYSCALE)
+img_path = 'data-road/clean_crop/image/5.jpg'
+img = cv2.imread(img_path)
 img = cv2.resize(img, (256, 256))  # 256x256
-# img_tensor = torch.from_numpy(img).float().div(255.0).permute(2,0,1).unsqueeze(0).to('cuda:1')
-img_tensor = torch.from_numpy(img).float().div(255.0).unsqueeze(0).unsqueeze(0).to('cuda:1')
+img_tensor = torch.from_numpy(img).float().div(255.0).permute(2,0,1).unsqueeze(0).to('cuda:0')
 
 # 前向传播获取预测结果
-# feature = backbone(img_tensor)
-output  = classifier(img_tensor)
+feature,logits = backbone(img_tensor)
+output  = classifier(feature)
 
 predicted_class_idx = [output.argmax(dim=1).item()]  # 获取最大概率的类别索引
 
@@ -58,8 +65,8 @@ final_conv_features = features_blobs[0]
 CAMs = getCAM(final_conv_features, fc_weights, predicted_class_idx)
 
 # 显示CAM和原始图像
-img = cv2.imread(img_path)
+# img = cv2.imread(img_path)
 height, width, _ = img.shape
 heatmap = cv2.applyColorMap(cv2.resize(CAMs[0], (width, height)), cv2.COLORMAP_JET)
-result  = (heatmap * 0.6 +  img * 0.4).astype(np.float32)
+result  = (heatmap * 0.3 +  img * 0.7).astype(np.float32)
 cv2.imwrite('cam_result.jpg', result)
