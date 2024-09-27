@@ -1,0 +1,69 @@
+
+# 1 Backbone
+”/network/UNet.py“:加深版unet。现用版。
+有归一和sigmoid，返回features,x
+
+”/network/unet_1.py”:加深版unet
+self.outc无归一和sigmoid，返回 x
+
+”/network/unet_2.py“:原版unet
+
+# 2 Classifier
+现用resnet系列.
+所有resnet工具已经在“/network/resnet.py”文件里
+原始简易版的classifier在“/network/UNet.py“里
+
+# 3 Tools
+test.py:批量生成cam
+test_classify:批量检测分类器效果
+
+cam.py:生成单张cam先用版
+infer.py:单张推理分割lable现用版
+infer_old.py:旧版
+
+# 4 往期log参考
+###比例之间你们再斟酌。分割损失直接影响infer的分割结果，分类损失直接影响cam的结果，而同时，没有对比损失的cam效果会好很多
+”/public/zjj/public/zjj/jy/rural-roadv4/log/2024-09-27-00-41-15“：分割损失+对比损失+0.01*分类损失
+”/public/zjj/public/zjj/jy/rural-roadv4/log/2024-09-27-12-33-00“：分割损失+0.01*分类损失
+
+# 5 Model
+dinknet34的路径：”/public/zjj/public/zjj/jy/rural-roadv4/model/DinkNet34.th“
+
+# 6 Datasets
+{  path:      /public/zjj/public/zjj/jy/rural-roadv2/dataset/dataset/deepglobal
+   category:  完整的deepglobal数据(clean)
+   size:      1024*1024
+   detail:    6226对image(_sat.jpg) & label (_mask.png)，没有编号
+}
+{  path:      /public/zjj/public/zjj/jy/rural-roadv2/dataset/dataset/deepglobal/train_crop
+   category:  完整的deepglobal的train集的切割数据(clean)
+   size:      256*256
+   detail:    67904对image(_{i}sat.jpg) & label (_{i}mask.png)，没有编号
+}
+{  path:      /public/zjj/public/zjj/jy/rural-roadv2/data/croproad
+   category:  完整的osm的数据(raw)
+   size:      1024*1024
+   detail:    562对image(_1.png) & label (_1 (2).png)，没有编号
+}
+{  path:      /public/zjj/public/zjj/jy/rural-roadv2/data/croproad_256_lp
+   category:  完整的osm的train集的切割数据(raw)
+   size:      256*256
+   detail:    6736对image(_{i}sat.jpg) & label (_{i}mask.png)，没有编号
+}
+
+以下是数据测试集小包，按需取
+{  path:      /public/zjj/public/zjj/xzx/data-road-clipped
+   category:  deepglobal(clean) & osm(raw)
+   size:      256*256
+   detail:    16384对images & label，已编好号
+}
+{  path:      /public/zjj/public/zjj/jy/rural-roadv4/clean_crop
+   category:  deepglobal(clean)
+   size:      256*256
+   detail:    200对images & label
+}
+{  path:      /public/zjj/public/zjj/jy/rural-roadv4/data-road
+   category:  deepglobal(clean) & osm(raw)
+   size:      1024*1024
+   detail:    各190对images & label
+}

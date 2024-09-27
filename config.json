@@ -6,17 +6,17 @@
     },
     "data": {
         "size": 1024,
-        "cuda": false,
-        "download": true,
+        "cuda": true,
+        "download": false,
         "root": "/public/zjj/public/zjj/xzx/data-road-clipped"
     },
     "dataloader": {
-        "clean_batch_size": 16,
-        "raw_batch_size":16
+        "clean_batch_size": 8,
+        "raw_batch_size":8
     },
     "train": {
-        "epochs": 100,
-        "learning_rate": 5e-4
+        "epochs": 200,
+        "learning_rate": 1e-3
     },
     "show": {
         "seg_loss_img": "seg_loss_img.jpg",
@@ -26,6 +26,6 @@
     "infer": {
         "share": false,
         "port": 8080,
-        "model_path": "/public/zjj/public/zjj/jy/rural-roadv4/log/2024-05-22-12-54-07/Epoch_100_Seg.pth"
+        "model_path": "/public/zjj/public/zjj/jy/rural-roadv4/log/2024-09-27-12-33-00/Epoch_200_Seg.pth"
     }
 }

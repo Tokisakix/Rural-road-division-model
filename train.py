@@ -1,5 +1,5 @@
-# nohup /public/zjj/anaconda3/envs/py37/bin/python3.7 /public/zjj/public/zjj/xzx/train.py &
 import os
+os.environ['CUDA_VISIBLE_DEVICES'] = '1,2,3'
 import torch
 import numpy as np
 import matplotlib.pyplot as plt
@@ -10,9 +10,11 @@ from data import get_dataset
 from dataloader import get_dataloader
 from load_config import load_config
 from logger import Logger
-from network.UNet import UNet
+from network.UNet import UNet,Classifier
+from network.loss import DicBceLoss
+
 from network.resnet import *
-# from network.DinkNet import *
+from network.DinkNet import *
 
 CONFIG        = load_config()
 CUDA          = CONFIG["cuda"]
@@ -29,7 +31,7 @@ SEG_LOSS_IMG  = os.path.join(logger.root, SHOW_CONFIG["seg_loss_img"])
 CTA_LOSS_IMG  = os.path.join(logger.root, SHOW_CONFIG["cta_loss_img"])
 CLASSIFIER_LOSS_IMG  = os.path.join(logger.root, SHOW_CONFIG["classifier_loss_img"])
 
-GPU           = [0, 1, 2, 3]
+GPU           = [0, 1, 2]
 torch.cuda.set_device('cuda:{}'.format(GPU[0]))
 
 def cal_Contra_loss(feature_maps, is_road):
@@ -51,6 +53,7 @@ def cal_Contra_loss(feature_maps, is_road):
             d   = torch.clamp(margin - torch.abs(a_feature - b_feature), min=0)
             loss+= d * d
     loss = loss.mean() / (2 * n)
+    #loss=torch.tensor(0.1, dtype=torch.float32)
     return loss
 
 def check_road(labels, unusual_percent):
@@ -78,19 +81,41 @@ def train(backbone, classifier, cam, seg_optimizer, seg_ceriterion, classifier_o
             labels   = labels.cuda(non_blocking=True) if CUDA else labels
             isroad   = isroad.cuda(non_blocking=True) if CUDA else isroad
 
+            # ————————————————————————————————————————————————————————
+            # outputs = backbone(inputs)
+            #
+            # seg_optimizer.zero_grad()
+            # seg_loss = seg_ceriterion(outputs, labels)
+            # tot_seg_loss += seg_loss.cpu().item()
+            # cta_loss = cal_Contra_loss(outputs, isroad)
+            # tot_cta_loss += cta_loss.cpu().item()
+            # seg_loss += cta_loss
+            # seg_loss.backward()
+            # seg_optimizer.step()
+            #
+            # outputs = classifier(inputs)
+            # classifier_optimizer.zero_grad()
+            # classifier_loss = classifier_ceriterion(outputs, isroad)
+            # classifier_loss.backward()
+            # tot_classifier_loss += classifier_loss.cpu().item()
+            # classifier_optimizer.step()
+
+        # ————————————————————————————————————————————————————————
+
+            # ————————————————————————————————————————————————————————
             seg_optimizer.zero_grad()
             classifier_optimizer.zero_grad()
 
             features,logits = backbone(inputs)
-            # print("features.shape",features.shape)  #torch.Size([16, 64, 256, 256])
-            # print("logits.shape",logits.shape)   #torch.Size([16, 1, 256, 256])
+            # print("features.shape",features.shape)  # torch.Size([16, 64, 256, 256])
+            # print("logits.shape",logits.shape)      # torch.Size([16, 1, 256, 256])
             outputs         = classifier(features)
-            # print("outputs.shape",outputs.shape)   #torch.Size([16, 2])
+            # print("outputs.shape",outputs.shape)    # torch.Size([16, 2])
 
             seg_loss        = seg_ceriterion(logits, labels)
             cta_loss        = cal_Contra_loss(features, isroad)
             classifier_loss = classifier_ceriterion(outputs, isroad)
-            total_loss      = seg_loss + cta_loss + classifier_loss
+            total_loss      = seg_loss + cta_loss + 0.01*classifier_loss
 
             total_loss.backward()
             classifier_optimizer.step()
@@ -99,6 +124,7 @@ def train(backbone, classifier, cam, seg_optimizer, seg_ceriterion, classifier_o
             tot_seg_loss        += seg_loss.cpu().item()
             tot_cta_loss        += cta_loss.cpu().item()
             tot_classifier_loss += classifier_loss.cpu().item()
+            # ————————————————————————————————————————————————————————
 
         seg_loss            = tot_seg_loss / len(dataloader)
         cta_loss            = tot_cta_loss / len(dataloader)
@@ -166,14 +192,14 @@ if __name__ == "__main__":
     logger.info("Data loaded.")
 
     model      = UNet()
-    classifier = resnet50(num_classes=2) #Classifier()
+    classifier = resnet50(num_classes=2)# classifier = Classifier()
     model      = nn.DataParallel(model.to('cuda:0'), device_ids=GPU, output_device=GPU[0]) if CUDA else model
     classifier = nn.DataParallel(classifier.to('cuda:0'), device_ids=GPU, output_device=GPU[0]) if CUDA else classifier
     logger.info("Model built.")
 
     seg_optimizer         = optim.Adam(model.parameters(), lr=LEARNING_RATE)
     classifier_optimizer  = optim.Adam(classifier.parameters(), lr=LEARNING_RATE * 0.1)
-    seg_ceriterion        = nn.BCEWithLogitsLoss()
+    seg_ceriterion        = nn.BCEWithLogitsLoss()  #DicBceLoss()
     classifier_ceriterion = nn.CrossEntropyLoss()
     # FIXME.CAM的使用
     # cam 目前已作为参数传入到 train() 函数中，具体用法依据之前讨论还未定下，故目前 CAM 在 train() 函数中是零作用

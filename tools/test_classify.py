@@ -1,3 +1,5 @@
+# import os
+# os.environ['CUDA_VISIBLE_DEVICES'] = '1,2,3'
 import cv2
 import cv2 as cv
 import numpy as np
@@ -7,10 +9,10 @@ import os
 import torchvision
 from torch import nn
 
-backbone   = torch.load('log/2024-05-22-12-54-07/Epoch_100_Seg.pth').to('cuda:0')
-classifier = torch.load('log/2024-05-22-12-54-07/Epoch_100_Classifier.pth').to('cuda:0')
+backbone   = torch.load(r'D:\大创\rural-roadv4\log\2024-06-07-19-22-09\Epoch_225_Seg.pth').to('cuda:0')
+classifier = torch.load(r'D:\大创\rural-roadv4\log\2024-06-07-19-22-09\Epoch_225_Classifier.pth').to('cuda:0')
 
-source_root="data-road/clean_cropp"
+source_root=r"D:\大创\rural-roadv4\data-road\clean_crop"
 
 def check_road(labels, unusual_percent):
     res = []
@@ -30,16 +32,21 @@ if isinstance(classifier,torch.nn.DataParallel):
 backbone.eval()
 classifier.eval()
 
-val = os.listdir(r"data-road/clean_crop/image")
+# for param_tensor in classifier.state_dict():
+#      print(param_tensor, "\t", classifier.state_dict()[param_tensor].size())
+
+
+
+val = os.listdir(r"../data-road/clean_crop/image")
 
 road_y = 0
 road_n = 0
 flag_y = 0
 flag_n = 0
 for i in range(1,201):
-    img = cv2.imread(f"data-road/clean_crop/image/{i}.jpg")
+    img = cv2.imread(f"../data-road/clean_crop/image/{i}.jpg")
     img = cv2.resize(img, (256, 256))
-    label = cv2.imread(f"data-road/clean_crop/label/{i}.jpg", cv.IMREAD_GRAYSCALE)
+    label = cv2.imread(f"../data-road/clean_crop/label/{i}.jpg", cv.IMREAD_GRAYSCALE)
 
     transforms = torchvision.transforms.Compose([
         torchvision.transforms.ToTensor(),

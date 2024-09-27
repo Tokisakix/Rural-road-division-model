@@ -109,6 +109,7 @@ class DinkNet34(nn.Module):
         out = self.finalrelu1(out)
         out = self.finalconv2(out)
         out = self.finalrelu2(out)
+        x=out
         out = self.finalconv3(out)
         
-        return F.sigmoid(out)
+        return x,F.sigmoid(out)

@@ -67,6 +67,7 @@ class OutConv(nn.Module):
         super(OutConv, self).__init__()
         self.conv = nn.Conv2d(in_channels, out_channels, kernel_size=1)
 
+
     def forward(self, x):
         return self.conv(x)
 
@@ -86,7 +87,11 @@ class UNet(nn.Module):
         self.up2  = Up(512, 128, bilinear)
         self.up3  = Up(256, 64, bilinear)
         self.up4  = Up(128, 64, bilinear)
-        self.outc = OutConv(64, n_classes)
+        # self.outc = OutConv(64, n_classes)
+        self.outc = nn.Sequential(
+            nn.Conv2d(in_channels=64, out_channels=1, kernel_size=1, stride=1, padding=0),
+            nn.BatchNorm2d(n_classes), nn.Sigmoid(),
+        )
 
     def forward(self, x):
         x1       = self.inc(x)
@@ -98,9 +103,10 @@ class UNet(nn.Module):
         x        = self.up2(x, x3)
         x        = self.up3(x, x2)
         x        = self.up4(x, x1)
-        features = x
-        logits   = self.outc(x)
-        return features, logits
+
+        features=x
+        x   = self.outc(x)
+        return features,x
 
 class Classifier(nn.Module):
     def __init__(self, in_channel=64, classes_num=2, p=0.5):

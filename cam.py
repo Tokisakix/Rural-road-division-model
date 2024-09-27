@@ -3,8 +3,9 @@ import numpy as np
 import torch
 import torchvision.transforms as transforms
 
-backbone   = torch.load('log/2024-05-21-21-54-21/Epoch_100_Seg.pth').to('cuda:0')
-classifier = torch.load('log/2024-05-21-21-54-21/Epoch_100_Classifier.pth').to('cuda:0')
+backbone   = torch.load("log/2024-09-27-00-41-15/Epoch_200_Seg.pth").to('cuda:0')
+classifier = torch.load("log/2024-09-27-00-41-15/Epoch_200_Classifier.pth").to('cuda:0')
+
 
 if isinstance(backbone,torch.nn.DataParallel):
         backbone = backbone.module

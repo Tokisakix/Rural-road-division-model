@@ -6,10 +6,9 @@ import os
 
 import torchvision
 
-backbone   = torch.load('log/2024-05-22-12-54-07/Epoch_100_Seg.pth').to('cuda:0')
-classifier = torch.load('log/2024-05-22-12-54-07/Epoch_100_Classifier.pth').to('cuda:0')
-
-source_root="data-road/clean_crop"
+backbone   = torch.load(r"D:\大创\rural-roadv4\log\2024-09-27-12-33-00\Epoch_200_Seg.pth").to('cuda:0')
+classifier = torch.load(r"D:\大创\rural-roadv4\log\2024-09-27-12-33-00\Epoch_200_Classifier.pth").to('cuda:0')
+source_root=r"D:\大创\rural-roadv4\data-road\clean_crop"
 
 def check_road(labels, unusual_percent):
     res = []
@@ -42,7 +41,7 @@ def getCAM(feature_conv, weight_softmax, class_idx):
 def hook_feature(module, input, output):
     features_blobs.append(output.data.cpu().numpy())
 
-val = os.listdir(r"D:\大创\rural-roadv4\data-road\clean_crop\image")
+val = os.listdir(r"../data-road/clean_crop/image")
 
 road_y = 0
 road_n = 0
@@ -63,9 +62,9 @@ for i in range(1,201):
     classifier.layer4.register_forward_hook(hook_feature)
     # classifier.conv3.register_forward_hook(hook_feature)
 
-    img = cv2.imread(f"data-road/clean_crop/image/{i}.jpg")
+    img = cv2.imread(f"../data-road/clean_crop/image/{i}.jpg")
     img = cv2.resize(img, (256, 256))
-    label = cv2.imread(f"data-road/clean_crop/label/{i}.jpg", cv.IMREAD_GRAYSCALE)
+    label = cv2.imread(f"../data-road/clean_crop/image/{i}.jpg", cv.IMREAD_GRAYSCALE)
 
     transforms = torchvision.transforms.Compose([
         torchvision.transforms.ToTensor(),
@@ -93,6 +92,7 @@ for i in range(1,201):
     height, width, _ = img.shape
     heatmap = cv2.applyColorMap(cv2.resize(CAMs[0], (width, height)), cv2.COLORMAP_JET)
     result = (heatmap * 0.4 + img * 0.6).astype(np.float32)
-    cv.imwrite(f"data-road/clean_crop/label/"+ f'{i}cam.png', result)
+    cv.imwrite(f"../data-road/clean_crop/"+ f'{i}cam.png', result)
     print("#")
+print("done.")
 
