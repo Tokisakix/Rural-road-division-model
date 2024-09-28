@@ -30,6 +30,7 @@ infer_old.py:旧版
 dinknet34的路径：”/public/zjj/public/zjj/jy/rural-roadv4/model/DinkNet34.th“
 
 # 6 Datasets
+已有的两个数据集deepglobal和osm
 {  path:      /public/zjj/public/zjj/jy/rural-roadv2/dataset/dataset/deepglobal
    category:  完整的deepglobal数据(clean)
    size:      1024*1024
@@ -50,6 +51,9 @@ dinknet34的路径：”/public/zjj/public/zjj/jy/rural-roadv4/model/DinkNet34.t
    size:      256*256
    detail:    6736对image(_{i}sat.jpg) & label (_{i}mask.png)，没有编号
 }
+
+新增的数据集
+/public/zjj/public/zjj/rd/guangdong_croproad
 
 以下是数据测试集小包，按需取
 {  path:      /public/zjj/public/zjj/xzx/data-road-clipped
